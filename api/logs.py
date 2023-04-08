@@ -1,8 +1,6 @@
-import logging
 from configparser import ConfigParser
-import os, sys
-# sys.path.append()
-sys.path.insert(0, os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))))
+import logging
+import sys
 
 def logger():
     """A Wrapper for logging to write both console and a log file 
@@ -30,9 +28,7 @@ def logger():
     Log level : DEBUG
     """
     config = ConfigParser()
-    # config.read('dns.ini') 
-    config.read(os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)), 'dns.ini')) 
-    # config.read('dns.ini')
+    config.read('dns.ini') 
     console_output = config["log"]["log_to_console"]
     log_file = config["log"]["log_file"]
     log_format = '%(asctime)s %(levelname)s %(message)s'

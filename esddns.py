@@ -5,7 +5,6 @@ from api.get_ip import WANIPState
 from api.logs import logger as logger_wrapper
 from time import sleep
 import sys
-import os
 
 class ESDDNS:
     """A Class to Synchronize WAN IP and DNS Record states

@@ -1,14 +1,12 @@
-
-import requests
 from configparser import ConfigParser
-import json
-from logs import logger as logger_wrapper 
-import sys
-import os
-from requests.exceptions import RequestException as RequestException
-from requests.exceptions import HTTPError as HTTPError
 from functools import wraps
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
+from logs import logger as logger_wrapper 
+from requests.exceptions import HTTPError as HTTPError
+from requests.exceptions import RequestException as RequestException
+import json
+import os
+import requests
+import sys
 
 class DomainManagement:
     """A Class to manage DNS Domain and Records and it's state
@@ -92,14 +90,8 @@ class DomainManagement:
     """
     def __init__(self):
         """Initializes DomainManagement class
-
         """
         self.config = ConfigParser()
-        # self.config_file_path = os.path.join(
-        #     os.path.abspath(
-        #         os.path.join(
-        #             os.path.dirname(__file__), os.pardir)), 'dns.ini') 
-        # self.config.read(self.config_file_path) 
         self.config.read('dns.ini')
         self.dns_config = dict(self.config["gandi"])
         self.header_auth = {"Authorization": "Apikey " + 

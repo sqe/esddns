@@ -8,9 +8,8 @@ import configparser
 import ipaddress
 import json
 import requests
-import sys, os
-sys.path.insert(0, os.path.abspath(os.path.join('..', '../')))
-sys.path.append(os.path.abspath('..'))
+import sys 
+
 class WANIPState:
     """A Class to retrieve Public WAN IP from multiple external sources 
     and return as a State
@@ -98,7 +97,6 @@ class WANIPState:
             which holds WAN IP State dictionary when WANIPState() class is called
         """
         return self.wan_ip_state()
-    # Retry request decorator method
     def retry_request(self, svc, func=None):
         """Decorator for request retry function func on external service svc, 
         Used if an external service is in flaky state but with retriable 
@@ -125,7 +123,6 @@ class WANIPState:
             sleep(self.retry_interval)
             func
 
-    # Method to retrieve IP from service
     def get_wan_ip(self, svc=None):
         """Retrieves Public WAN IP from external service.
         Retries if HTTP STATUS CODE is in list:[408, 429, 449, 500, 502, 503, 504, 509]
@@ -182,7 +179,6 @@ class WANIPState:
                 self.logger.critical(log_msg)
                 return (None, svc)
        
-    # Multi-threaded IP extraction
     def ips_extraction(self):
         """Dynamic multi-threaded extraction of valid Public WAN IPs from services 
         via get_wan_ip method.

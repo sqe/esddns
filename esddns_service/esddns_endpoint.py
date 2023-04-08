@@ -50,8 +50,6 @@ Returns:
 
 """
 
-
-import os, sys
 from configparser import ConfigParser
 from esddns.esddns import ESDDNS as ESDDNSC 
 from flask import Flask, render_template
@@ -145,7 +143,7 @@ def render_page():
     Renders:
         html: HTML page with data composed from dynamic global cached state
     """
-    return render_template("esddns.html", st=g_cached_state)
+    return render_template("esddns.html", display_cached=g_cached_state)
 
 if __name__ == '__main__':
     app.run(
@@ -153,4 +151,3 @@ if __name__ == '__main__':
         host=config["ESDDNS"]["service_host"], 
         port=config["ESDDNS"]["service_port"], 
         threaded=True)
-

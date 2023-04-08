@@ -30,18 +30,18 @@
     <hr>
     Current ESDDNS State:
     <em>
-    State Poll Date: <u>{{ st["poll_date"] }}</u>
+    State Poll Date: <u>{{ display_cached["poll_date"] }}</u>
     WAN IP State: 
-        Is IP address usable?: {{ st["wan_ip_state"]["usable"] }}
-        Your WAN IPv4 address: <u><mark>{{ st["wan_ip_state"]["IP"] }}</mark></u>
+        Is IP address usable?: {{ display_cached["wan_ip_state"]["usable"] }}
+        Your WAN IPv4 address: <u><mark>{{ display_cached["wan_ip_state"]["IP"] }}</mark></u>
     DNS Record State: 
-        Is DNS Record in sync?: {{ st["record_state"]["in_sync"] }}
+        Is DNS Record in sync?: {{ display_cached["record_state"]["in_sync"] }}
         Recordset Data:
-            Record Set Name: {{ st["record_state"]["record_data"]["rrset_name"] }}
-            Record Set Type: {{ st["record_state"]["record_data"]["rrset_type"] }}
-            Record Set Time To Live: {{ st["record_state"]["record_data"]["rrset_ttl"] }}
-            Record Set Values: <u><mark>{{ st["record_state"]["record_data"]["rrset_values"] }}</mark></u>
-            Record Set HREF: {{ st["record_state"]["record_data"]["rrset_href"] }}
+            Record Set Name: {{ display_cached["record_state"]["record_data"]["rrset_name"] }}
+            Record Set Type: {{ display_cached["record_state"]["record_data"]["rrset_type"] }}
+            Record Set Time To Live: {{ display_cached["record_state"]["record_data"]["rrset_ttl"] }}
+            Record Set Values: <u><mark>{{ display_cached["record_state"]["record_data"]["rrset_values"] }}</mark></u>
+            Record Set HREF: {{ display_cached["record_state"]["record_data"]["rrset_href"] }}
         </em>
     <hr>
     <!-- <small> -->
