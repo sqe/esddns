@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>esddns_service.esddns_endpoint &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">esddns</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">esddns_service.esddns_endpoint</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for esddns_service.esddns_endpoint</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;ESDDNS Web-Service with Flask</span>
+<span class="sd">Flask application launches with ESDDNS in background as scheduled job, interval is </span>
+<span class="sd">configured in configuration file.</span>
+
+<span class="sd">ESDDNS running as a background job manages a dynamic cache which is initiated </span>
+<span class="sd">before pulling the current ESDDNS state.</span>
+
+<span class="sd">Resolution for cold start when user requests root endpoint / HTML template is</span>
+<span class="sd">rendered with the values from cache which is managed by background job </span>
+<span class="sd">running ``current_state()`` function</span>
+
+<span class="sd">How It Works:</span>
+<span class="sd">    </span>
+<span class="sd">    Initialize scheduled daemon to run ESDDNS in background </span>
+<span class="sd">        And then in FLASK app context, addressing cold start scenario where </span>
+<span class="sd">        user would have waited for first request response to populate </span>
+<span class="sd">        the current ESDDNS state. FLASK app context is only used to render the </span>
+<span class="sd">        state populated as dynamic global cached state which gets refreshed </span>
+<span class="sd">        each time daemon runs. Thus ESDDNS state is already known </span>
+<span class="sd">        when FLASK app context starts, and the first run of the daemon thread </span>
+<span class="sd">        will be executed to manage cached state with `current_state()` function.</span>
+<span class="sd">        Daemon is scheduled `interval` retrieved from configs and will run forever until</span>
+<span class="sd">        service is forced to stop.    </span>
+
+<span class="sd">    Initialize Flask application `app`, `global_cache()` and `current_state()` are </span>
+<span class="sd">        initiated within app context, daemon starts in background and takes </span>
+<span class="sd">        over management of the dynamic global state cache</span>
+
+<span class="sd">Returns:</span>
+<span class="sd">    - Dictionary: ESDDNS State </span>
+<span class="sd">        - Syncrhonized Union of managed WAN IP and DNS A Record states</span>
+<span class="sd">    - endpoint: `http://localhost:port/`</span>
+<span class="sd">        - HTML template with current ESDDNS state for example</span>
+<span class="sd">            - Current ESDDNS State:</span>
+<span class="sd">                - State Poll Date: 2023-04-02 20:12:00</span>
+<span class="sd">                - WAN IP State: </span>
+<span class="sd">                    - Is IP address usable?: True</span>
+<span class="sd">                    - Your WAN IPv4 address: xx.xx.xx.xx</span>
+<span class="sd">                - DNS Record State: </span>
+<span class="sd">                    - Is DNS Record in sync?: True</span>
+<span class="sd">                    - Recordset Data:</span>
+<span class="sd">                        - Record Set Name: @</span>
+<span class="sd">                        - Record Set Type: A</span>
+<span class="sd">                        - Record Set Time To Live: 300</span>
+<span class="sd">                        - Record Set Values: [&#39;xx.xx.xx.xx&#39;]</span>
+<span class="sd">                        - Record Set HREF: </span>
+<span class="sd">                            https://api.gandi.net/v5/livedns/domains/your_domain.com/records/%40/A</span>
+<span class="sd">    - endpoint: `http://localhost:port/raw`</span>
+<span class="sd">        - Syncrhonized union of managed WAN IP and DNS A Record states as RAW json </span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">esddns.esddns</span> <span class="kn">import</span> <span class="n">ESDDNS</span> <span class="k">as</span> <span class="n">ESDDNSC</span> 
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span>
+<span class="kn">from</span> <span class="nn">api.logs</span> <span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">apscheduler.schedulers.background</span> <span class="kn">import</span> <span class="n">BackgroundScheduler</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+<span class="n">scheduled_daemon</span> <span class="o">=</span> <span class="n">BackgroundScheduler</span><span class="p">(</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;dns.ini&#39;</span><span class="p">)</span>
+<span class="n">esddns_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ESDDNS&quot;</span><span class="p">])</span>
+<span class="n">g_cached_state</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+<span class="n">cur_state</span> <span class="o">=</span> <span class="n">ESDDNSC</span><span class="p">()</span>
+
+<div class="viewcode-block" id="timestamp"><a class="viewcode-back" href="../../esddns_service.html#esddns_service.esddns_endpoint.timestamp">[docs]</a><span class="k">def</span> <span class="nf">timestamp</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stored date time stamp</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        class: datetime.datetime</span>
+<span class="sd">        Formatted with &quot;%Y-%m-%d %H:%M:%S&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+
+<span class="n">poll_timestamp</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;poll_date&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+<span class="n">poll_timestamp</span><span class="p">[</span><span class="s2">&quot;poll_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="p">)</span>
+
+<div class="viewcode-block" id="global_cache"><a class="viewcode-back" href="../../esddns_service.html#esddns_service.esddns_endpoint.global_cache">[docs]</a><span class="k">def</span> <span class="nf">global_cache</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stored dynamic global cached state</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: `g_cached_state`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">g_cached_state</span>
+    <span class="k">return</span> <span class="n">g_cached_state</span></div>
+
+<div class="viewcode-block" id="current_state"><a class="viewcode-back" href="../../esddns_service.html#esddns_service.esddns_endpoint.current_state">[docs]</a><span class="k">def</span> <span class="nf">current_state</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads and fills `g_cached_state`, current union of WAN IP and DNS Record states </span>
+<span class="sd">    with timestamp is stored as `state_cache`.</span>
+<span class="sd">        - During initial start `g_cached_state` is empty</span>
+<span class="sd">            - Assign value of current state cache with timestamp</span>
+<span class="sd">            - Addresses cold start</span>
+<span class="sd">        - During subsequent scheduled daemon thread transactions</span>
+<span class="sd">            - `g_cached_state` doesn&#39;t equal to current state_cache, </span>
+<span class="sd">            assign the most recent state_cache with current timestamp </span>
+<span class="sd">            (not from timestamp() function) and returns globally cached state   </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: current state cache</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">g_cached_state</span>
+    <span class="n">state_val</span> <span class="o">=</span> <span class="n">cur_state</span><span class="p">()</span>
+    <span class="n">state_date</span> <span class="o">=</span> <span class="n">poll_timestamp</span>
+    <span class="n">state_cache</span> <span class="o">=</span> <span class="n">state_val</span> <span class="o">|</span> <span class="n">state_date</span>     
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">g_cached_state</span><span class="p">:</span>
+        <span class="n">g_cached_state</span> <span class="o">=</span> <span class="n">state_cache</span>
+    <span class="k">elif</span> <span class="n">g_cached_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">state_cache</span><span class="p">:</span>
+        <span class="n">poll_timestamp</span><span class="p">[</span><span class="s2">&quot;poll_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="p">)</span>
+        <span class="n">g_cached_state</span> <span class="o">=</span> <span class="n">state_val</span> <span class="o">|</span> <span class="n">poll_timestamp</span> 
+        <span class="k">return</span>  <span class="n">g_cached_state</span>
+    <span class="k">return</span> <span class="n">state_cache</span></div>
+
+<span class="n">scheduled_daemon</span><span class="o">.</span><span class="n">add_job</span><span class="p">(</span>
+    <span class="n">current_state</span><span class="p">,</span>
+    <span class="s1">&#39;interval&#39;</span><span class="p">,</span>
+    <span class="n">seconds</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">esddns_config</span><span class="p">[</span><span class="s2">&quot;daemon_thread_interval&quot;</span><span class="p">]))</span>
+<span class="n">scheduled_daemon</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;JSON_AS_ASCII&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PROPAGATE_EXCEPTIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+    <span class="n">global_cache</span><span class="p">()</span>
+    <span class="n">current_state</span><span class="p">()</span>
+
+<div class="viewcode-block" id="start"><a class="viewcode-back" href="../../esddns_service.html#esddns_service.esddns_endpoint.start">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/raw&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;endpoint: /raw </span>
+
+<span class="sd">    Renders:</span>
+<span class="sd">        dict: dynamic global cached state</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">g_cached_state</span></div>
+
+<div class="viewcode-block" id="render_page"><a class="viewcode-back" href="../../esddns_service.html#esddns_service.esddns_endpoint.render_page">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">render_page</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;endpoint: / </span>
+
+<span class="sd">    Renders:</span>
+<span class="sd">        html: HTML page with data composed from dynamic global cached state</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;esddns.html&quot;</span><span class="p">,</span> <span class="n">display_cached</span><span class="o">=</span><span class="n">g_cached_state</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">host</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ESDDNS&quot;</span><span class="p">][</span><span class="s2">&quot;service_host&quot;</span><span class="p">],</span> 
+        <span class="n">port</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ESDDNS&quot;</span><span class="p">][</span><span class="s2">&quot;service_port&quot;</span><span class="p">],</span> 
+        <span class="n">threaded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

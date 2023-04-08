@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>esddns_service package &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="api package" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">esddns</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esddns.html">esddns package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">api package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">esddns_service package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-esddns_service.esddns_endpoint">esddns_service.esddns_endpoint module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#esddns_service.esddns_endpoint.current_state"><code class="docutils literal notranslate"><span class="pre">current_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esddns_service.esddns_endpoint.global_cache"><code class="docutils literal notranslate"><span class="pre">global_cache()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esddns_service.esddns_endpoint.render_page"><code class="docutils literal notranslate"><span class="pre">render_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esddns_service.esddns_endpoint.start"><code class="docutils literal notranslate"><span class="pre">start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esddns_service.esddns_endpoint.timestamp"><code class="docutils literal notranslate"><span class="pre">timestamp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-esddns_service">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">esddns</a></li>
+          <li class="breadcrumb-item"><a href="esddns.html">esddns package</a></li>
+      <li class="breadcrumb-item active">esddns_service package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/esddns_service.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="esddns-service-package">
+<h1>esddns_service package<a class="headerlink" href="#esddns-service-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-esddns_service.esddns_endpoint">
+<span id="esddns-service-esddns-endpoint-module"></span><h2>esddns_service.esddns_endpoint module<a class="headerlink" href="#module-esddns_service.esddns_endpoint" title="Permalink to this heading"></a></h2>
+<p>ESDDNS Web-Service with Flask
+Flask application launches with ESDDNS in background as scheduled job, interval is
+configured in configuration file.</p>
+<p>ESDDNS running as a background job manages a dynamic cache which is initiated
+before pulling the current ESDDNS state.</p>
+<p>Resolution for cold start when user requests root endpoint / HTML template is
+rendered with the values from cache which is managed by background job
+running <code class="docutils literal notranslate"><span class="pre">current_state()</span></code> function</p>
+<p>How It Works:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Initialize scheduled daemon to run ESDDNS in background</dt><dd><p>And then in FLASK app context, addressing cold start scenario where
+user would have waited for first request response to populate
+the current ESDDNS state. FLASK app context is only used to render the
+state populated as dynamic global cached state which gets refreshed
+each time daemon runs. Thus ESDDNS state is already known
+when FLASK app context starts, and the first run of the daemon thread
+will be executed to manage cached state with <cite>current_state()</cite> function.
+Daemon is scheduled <cite>interval</cite> retrieved from configs and will run forever until
+service is forced to stop.</p>
+</dd>
+<dt>Initialize Flask application <cite>app</cite>, <cite>global_cache()</cite> and <cite>current_state()</cite> are</dt><dd><p>initiated within app context, daemon starts in background and takes
+over management of the dynamic global state cache</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ESDDNS State</dt><dd><ul class="simple">
+<li><p>Syncrhonized Union of managed WAN IP and DNS A Record states</p></li>
+</ul>
+</dd>
+</dl>
+<ul class="simple">
+<li><dl class="simple">
+<dt>endpoint: <cite>http://localhost:port/</cite></dt><dd><ul>
+<li><dl class="simple">
+<dt>HTML template with current ESDDNS state for example</dt><dd><ul>
+<li><dl class="simple">
+<dt>Current ESDDNS State:</dt><dd><ul>
+<li><p>State Poll Date: 2023-04-02 20:12:00</p></li>
+<li><dl class="simple">
+<dt>WAN IP State:</dt><dd><ul>
+<li><p>Is IP address usable?: True</p></li>
+<li><p>Your WAN IPv4 address: xx.xx.xx.xx</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>DNS Record State:</dt><dd><ul>
+<li><p>Is DNS Record in sync?: True</p></li>
+<li><dl class="simple">
+<dt>Recordset Data:</dt><dd><ul>
+<li><p>Record Set Name: &#64;</p></li>
+<li><p>Record Set Type: A</p></li>
+<li><p>Record Set Time To Live: 300</p></li>
+<li><p>Record Set Values: [‘xx.xx.xx.xx’]</p></li>
+<li><dl class="simple">
+<dt>Record Set HREF:</dt><dd><p><a class="reference external" href="https://api.gandi.net/v5/livedns/domains/your_domain.com/records/%40/A">https://api.gandi.net/v5/livedns/domains/your_domain.com/records/%40/A</a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>endpoint: <cite>http://localhost:port/raw</cite></dt><dd><ul>
+<li><p>Syncrhonized union of managed WAN IP and DNS A Record states as RAW json</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>Dictionary</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="esddns_service.esddns_endpoint.current_state">
+<span class="sig-prename descclassname"><span class="pre">esddns_service.esddns_endpoint.</span></span><span class="sig-name descname"><span class="pre">current_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns_service/esddns_endpoint.html#current_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns_service.esddns_endpoint.current_state" title="Permalink to this definition"></a></dt>
+<dd><p>Reads and fills <cite>g_cached_state</cite>, current union of WAN IP and DNS Record states
+with timestamp is stored as <cite>state_cache</cite>.</p>
+<blockquote>
+<div><ul>
+<li><dl class="simple">
+<dt>During initial start <cite>g_cached_state</cite> is empty</dt><dd><ul class="simple">
+<li><p>Assign value of current state cache with timestamp</p></li>
+<li><p>Addresses cold start</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>During subsequent scheduled daemon thread transactions</dt><dd><ul class="simple">
+<li><p><cite>g_cached_state</cite> doesn’t equal to current state_cache,</p></li>
+</ul>
+<p>assign the most recent state_cache with current timestamp
+(not from timestamp() function) and returns globally cached state</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>current state cache</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="esddns_service.esddns_endpoint.global_cache">
+<span class="sig-prename descclassname"><span class="pre">esddns_service.esddns_endpoint.</span></span><span class="sig-name descname"><span class="pre">global_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns_service/esddns_endpoint.html#global_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns_service.esddns_endpoint.global_cache" title="Permalink to this definition"></a></dt>
+<dd><p>Stored dynamic global cached state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>g_cached_state</cite></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="esddns_service.esddns_endpoint.render_page">
+<span class="sig-prename descclassname"><span class="pre">esddns_service.esddns_endpoint.</span></span><span class="sig-name descname"><span class="pre">render_page</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns_service/esddns_endpoint.html#render_page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns_service.esddns_endpoint.render_page" title="Permalink to this definition"></a></dt>
+<dd><p>endpoint: /</p>
+<dl class="simple">
+<dt>Renders:</dt><dd><p>html: HTML page with data composed from dynamic global cached state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="esddns_service.esddns_endpoint.start">
+<span class="sig-prename descclassname"><span class="pre">esddns_service.esddns_endpoint.</span></span><span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns_service/esddns_endpoint.html#start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns_service.esddns_endpoint.start" title="Permalink to this definition"></a></dt>
+<dd><p>endpoint: /raw</p>
+<dl class="simple">
+<dt>Renders:</dt><dd><p>dict: dynamic global cached state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="esddns_service.esddns_endpoint.timestamp">
+<span class="sig-prename descclassname"><span class="pre">esddns_service.esddns_endpoint.</span></span><span class="sig-name descname"><span class="pre">timestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns_service/esddns_endpoint.html#timestamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns_service.esddns_endpoint.timestamp" title="Permalink to this definition"></a></dt>
+<dd><p>Stored date time stamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime.datetime
+Formatted with “%Y-%m-%d %H:%M:%S”</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>class</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-esddns_service">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-esddns_service" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="api package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
