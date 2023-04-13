@@ -12,7 +12,6 @@ class DaemonUnAuthedBadService(unittest.TestCase):
     """
     @classmethod
     def setUpClass(self):
-        # os.environ["API_KEY"] = ""  # Set incorrect key
         self.config = ConfigParser()
         self.config.read("dns.ini")
         self.ip_conf = dict(self.config["WANIPState"])
@@ -23,9 +22,6 @@ class DaemonUnAuthedBadService(unittest.TestCase):
             self.config.write(ini)
 
         self.scribe = scribe()
-        # self.gandi_conf = dict(self.config["gandi"])
-        # self.api_url_base = self.gandi_conf["api_url_base"]
-
 
     @classmethod
     def tearDown(self):
@@ -57,7 +53,6 @@ class DaemonUnAuthedBadService(unittest.TestCase):
             assert expected_msg + str(urlparse(check_svc).hostname) in str(self.scribe)
 
     def test_whisper_ip_svc_connection_error(self):
-        # expected_msg ='CRITICAL "SKIPPING: Please check if service is accessible:'
         whisper = str(self.scribe[24])
         assert self.ip_conf["msg_connection_error"][:-13] in whisper 
 
