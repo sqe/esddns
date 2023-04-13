@@ -12,9 +12,8 @@ keywords = ["dyndns", "dynamicdns", "dns", "dynamic"]
 [project.urls]
 issue_tracker = "https://github.com/sqe/esddns/issues"
 repository = "https://github.com/sqe/esddns"
-documentation = "https://sqe.github.io/esddns/"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent"
+"Programming Language :: Python :: 3",
+"License :: OSI Approved :: MIT License",
+"Operating System :: OS Independent"
 ]
