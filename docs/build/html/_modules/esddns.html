@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>esddns &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">esddns</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">esddns</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for esddns</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">api.dns_manager</span> <span class="kn">import</span> <span class="n">DomainManagement</span> 
+<span class="kn">from</span> <span class="nn">api.get_ip</span> <span class="kn">import</span> <span class="n">WANIPState</span> 
+<span class="kn">from</span> <span class="nn">api.logs</span> <span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<div class="viewcode-block" id="ESDDNS"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS">[docs]</a><span class="k">class</span> <span class="nc">ESDDNS</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Class to Synchronize WAN IP and DNS Record states</span>
+
+<span class="sd">    - When ESDDNS is ran directly from shell by executing: ``python esddns.py``</span>
+<span class="sd">    It runs in Standalone mode with Daemon Thread which&#39;s interval is set in </span>
+<span class="sd">    configurationfile</span>
+<span class="sd">    </span>
+<span class="sd">    - When imported as module, runs the Functor to return synchronized </span>
+<span class="sd">    dynamic union of managed WAN IP and DNS Record states</span>
+<span class="sd">    Methods:</span>
+<span class="sd">    </span>
+<span class="sd">    __init__(self):</span>
+<span class="sd">       Initiates configuration, DomainManagement class, WAN IP State class, logging</span>
+<span class="sd">    </span>
+<span class="sd">       Defaults</span>
+<span class="sd">            `self.config` : Object instance</span>
+<span class="sd">                ConfigParser instance</span>
+<span class="sd">            `self.config.read(&#39;dns.ini&#39;)` : file </span>
+<span class="sd">                Configuration file</span>
+<span class="sd">            `self.cur_conf` : dict</span>
+<span class="sd">                dictionary of variables of ESDDNS section from configuration file</span>
+<span class="sd">            `self.dns_manager`: Class instance</span>
+<span class="sd">                Initializes DomainManagement class </span>
+<span class="sd">            `self.wan_ip_state`: Functor</span>
+<span class="sd">                WAN IP State as dictionary</span>
+<span class="sd">            `self.logger` : Method instance</span>
+<span class="sd">                logger_wrapper() log wrapper instance        </span>
+<span class="sd">    __call__(self):</span>
+<span class="sd">        Functor to return dynamic union of managed WAN IP and DNS A Record States</span>
+<span class="sd">        when ESDDNS() class is called</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes ESDDNS class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;dns.ini&#39;</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ESDDNS&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dns_manager</span> <span class="o">=</span> <span class="n">DomainManagement</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wan_ip_state</span> <span class="o">=</span> <span class="n">WANIPState</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Functor to return dynamic union of WAN IP and DNS A Record States</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            functor: Returns object function ESDDNS().sync_states()</span>
+<span class="sd">            which holds dynamic union of WAN IP and DNS A Record States </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_states</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ESDDNS.sync_states"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS.sync_states">[docs]</a>    <span class="k">def</span> <span class="nf">sync_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Manages both WAN IP and DNS A Records States for synchronization.</span>
+<span class="sd">        Updates DNS A Record&#39;s IP address if it&#39;s out of sync.</span>
+<span class="sd">        Logs each transaction.</span>
+<span class="sd">        Gracefully exits if synchronization fails. </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ``{&#39;wan_ip_state&#39;: {&#39;usable&#39;: True, &#39;IP&#39;: &#39;WAN_IP&#39;}, </span>
+<span class="sd">        &#39;record_state&#39;: {&#39;in_sync&#39;: True, &#39;record_data&#39;: {data}}}``</span>
+<span class="sd">            - dict: states union</span>
+<span class="sd">                - When DNS Record state is in sync, </span>
+<span class="sd">                Union of WAN IP and DNS A Record states. </span>
+<span class="sd">                - When DNS A Record state is not in sync</span>
+<span class="sd">                Updates DNS A Record IP with current WAN IP</span>
+<span class="sd">            - exit: Quit ESDDNs with message</span>
+<span class="sd">                If can&#39;t update DNS A record</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wan_ip_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wan_ip_state</span><span class="p">()</span>
+        <span class="n">wan_ip</span> <span class="o">=</span> <span class="n">wan_ip_state</span><span class="p">[</span><span class="s2">&quot;wan_ip_state&quot;</span><span class="p">][</span><span class="s2">&quot;IP&quot;</span><span class="p">]</span> 
+        <span class="n">states_union</span> <span class="o">=</span> <span class="n">wan_ip_state</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_manager</span><span class="o">.</span><span class="n">a_record_state</span><span class="p">(</span><span class="n">wan_ip</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">states_union</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;in_sync&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span><span class="p">[</span><span class="s2">&quot;msg_ip_dns_in_sync&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">states_union</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">states_union</span>
+
+        <span class="k">elif</span> <span class="n">states_union</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;in_sync&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">log_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span><span class="p">[</span><span class="s2">&quot;msg_dns_not_in_sync&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">states_union</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span><span class="p">[</span><span class="s2">&quot;msg_dns_update&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">wan_ip</span><span class="p">))</span>
+            <span class="n">update_rec</span><span class="p">,</span> <span class="n">status_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_manager</span><span class="o">.</span><span class="n">update_a_record</span><span class="p">(</span><span class="n">wan_ip</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">:</span>
+                <span class="n">states_union</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;in_sync&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">states_union</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;record_data&quot;</span><span class="p">][</span><span class="s2">&quot;rrset_values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wan_ip</span>
+                <span class="n">log_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span><span class="p">[</span><span class="s2">&quot;msg_dns_update_success&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">states_union</span><span class="p">)</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_conf</span><span class="p">[</span><span class="s2">&quot;msg_dns_update_fail&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">update_rec</span><span class="p">,</span> 
+                    <span class="n">status_code</span><span class="p">)</span>                
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>    
+            <span class="k">return</span> <span class="n">update_rec</span> <span class="p">,</span> <span class="n">states_union</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">standalone_conf</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="n">standalone_conf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;dns.ini&quot;</span><span class="p">)</span>
+    <span class="n">daemon_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">standalone_conf</span><span class="p">[</span><span class="s2">&quot;ESDDNS&quot;</span><span class="p">])</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">daemon_conf</span><span class="p">[</span><span class="s2">&quot;daemon_thread_interval&quot;</span><span class="p">])</span>
+    <span class="n">welcome_msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    --------------|----|----------</span>
+<span class="s1">    ,---.,---.,---|,---|,---.,---.</span>
+<span class="s1">    |---&#39;`---.|   ||   ||   |`---.</span>
+<span class="s1">    `---&#39;`---&#39;`---&#39;`---&#39;`   &#39;`---&#39;</span>
+<span class="s1">              For Emil and Stella!</span>
+<span class="s1">    </span>
+<span class="s1">    Welcome to ESDDNS Standalone mode!</span>
+
+<span class="s1">    ESDDNS is an Open Source solution to automatically synchronize public </span>
+<span class="s1">    WAN IPv4 address with a target DNS A Record when there is a configuration drift </span>
+<span class="s1">    due to IPv4 address changes. </span>
+<span class="s1">    </span>
+<span class="s1">    Creates and manages dynamic states for WAN IPv4 and DNS Record.  </span>
+<span class="s1">    Utilizes dynamic public WAN IPv4 address discovered and retrieved from </span>
+<span class="s1">    external IPv4 check services, automatically synchronizes it with </span>
+<span class="s1">    managed DNS A record via REST APIs.</span>
+
+<span class="s1">    ---------------------------------</span>
+<span class="s1">    Scheduled Daemon Thread Interval: </span><span class="si">{}</span><span class="s1"> seconds</span>
+<span class="s1">        &#39;&#39;&#39;</span>
+    <span class="n">logger_wrapper</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">welcome_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interval</span><span class="p">))</span>
+
+    <span class="n">logger_wrapper</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">daemon_conf</span><span class="p">[</span><span class="s2">&quot;msg_daemon_scheduled&quot;</span><span class="p">])</span>
+    <span class="k">while</span> <span class="kc">True</span> <span class="p">:</span>
+        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">logger_wrapper</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">daemon_conf</span><span class="p">[</span><span class="s2">&quot;msg_daemon_exec&quot;</span><span class="p">])</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">ESDDNS</span><span class="p">())</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">jobs</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="n">logger_wrapper</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">daemon_conf</span><span class="p">[</span><span class="s2">&quot;msg_daemon_next_exec&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interval</span><span class="p">))</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>            
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
