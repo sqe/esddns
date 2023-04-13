@@ -1,34 +1,32 @@
 """ESDDNS Web-Service with Flask
-Flask application launches with ESDDNS in background as scheduled job, interval is 
+Flask application launches with ESDDNS to heat up dynamic cache, initiates
+background daemon thread as scheduled daemon to manage the dynamic cache, interval is 
 configured in configuration file.
-
-ESDDNS running as a background job manages a dynamic cache which is initiated 
-before pulling the current ESDDNS state.
-
-Resolution for cold start when user requests root endpoint / HTML template is
-rendered with the values from cache which is managed by background job 
-running ``current_state()`` function
-
-How It Works:
     
-    Initialize scheduled daemon to run ESDDNS in background 
-        And then in FLASK app context, addressing cold start scenario where 
-        user would have waited for first request response to populate 
-        the current ESDDNS state. FLASK app context is only used to render the 
-        state populated as dynamic global cached state which gets refreshed 
-        each time daemon runs. Thus ESDDNS state is already known 
-        when FLASK app context starts, and the first run of the daemon thread 
-        will be executed to manage cached state with `current_state()` function.
-        Daemon is scheduled `interval` retrieved from configs and will run forever until
-        service is forced to stop.    
+How It Works:
 
-    Initialize Flask application `app`, `global_cache()` and `current_state()` are 
-        initiated within app context, daemon starts in background and takes 
-        over management of the dynamic global state cache
+    Initialize current_state() and g_cached_state() with Flask application context,
+    i.e. when Flask application starts. To address the cold start scenario where user
+    would have waited for the first request response to populate the current 
+    ESDDNS state. 
+    
+    Scheduling a daemon to run ESDDNS in background also takes place right after 
+    initial current_state() call in Flask application context.  
+
+    FLASK application context is only used to pre-heat the cache for cold start, and 
+    to render the state populated as dynamic global cached state.
+
+    The global dynamic cached state gets refreshed each time daemon exuctes (runs 
+    the current_state function). 
+
+    Daemon is scheduled `interval` retrieved from configs and will run forever until
+    service is forced to stop.    
 
 Returns:
+
     - Dictionary: ESDDNS State 
         - Syncrhonized Union of managed WAN IP and DNS A Record states
+
     - endpoint: `http://localhost:port/`
         - HTML template with current ESDDNS state for example
             - Current ESDDNS State:
@@ -45,9 +43,9 @@ Returns:
                         - Record Set Values: ['xx.xx.xx.xx']
                         - Record Set HREF: 
                             https://api.gandi.net/v5/livedns/domains/your_domain.com/records/%40/A
+
     - endpoint: `http://localhost:port/raw`
         - Syncrhonized union of managed WAN IP and DNS A Record states as RAW json 
-
 """
 
 from configparser import ConfigParser
@@ -91,6 +89,7 @@ def current_state():
     """
     Reads and fills `g_cached_state`, current union of WAN IP and DNS Record states 
     with timestamp is stored as `state_cache`.
+
         - During initial start `g_cached_state` is empty
             - Assign value of current state cache with timestamp
             - Addresses cold start
