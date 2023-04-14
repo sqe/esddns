@@ -20,4 +20,4 @@ issue_tracker = "https://github.com/sqe/esddns/issues"
 repository = "https://github.com/sqe/esddns"
 
 [tools.setuptools]
-py-modules = ["esddns", "api","esddns_service"]
+packages = ["esddns", "api","esddns_service"]
