@@ -7,15 +7,14 @@ authors = [
 ]
 description = "Open Source Dynamic DNS"
 readme = "README.md"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = ["dyndns", "dynamicdns", "dns", "dynamic"]
+
+classifiers = [
+"Programming Language :: Python :: 3",
+"Operating System :: OS Independent"
+]
 
 [project.urls]
 issue_tracker = "https://github.com/sqe/esddns/issues"
 repository = "https://github.com/sqe/esddns"
-
-classifiers = [
-"Programming Language :: Python :: 3",
-"License :: OSI Approved :: MIT License",
-"Operating System :: OS Independent"
-]
