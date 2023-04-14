@@ -15,3 +15,5 @@ Creates and manages dynamic states for WAN IPv4 and DNS Record.
 Utilizes dynamic public WAN IPv4 address discovered and retrieved from 
 external IPv4 check services, automatically synchronizes it with 
 managed DNS A record via REST APIs.
+
+[Documentation](https://sqe.github.io/esddns/)
