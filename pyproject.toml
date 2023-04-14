@@ -7,7 +7,7 @@ authors = [
 ]
 description = "Open Source Dynamic DNS"
 readme = "README.md"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = ["dyndns", "dynamicdns", "dns", "dynamic"]
 
 classifiers = [
