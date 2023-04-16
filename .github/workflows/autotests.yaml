@@ -39,13 +39,4 @@ jobs:
           ruff --format=github --target-version=py37 .
       - name: Test with pytest
         run: |
-          export API_KEY=$API_KEY
-          export TARGET_DOMAIN_FQDN=$TARGET_DOMAIN_FQDN
-          export RECORD_NAME_ROOT=$RECORD_NAME_ROOT
-          export RECORD_TYPE_A=$RECORD_TYPE_A
-          export RECORD_TTL=$RECORD_TTL
-          export LOG_TO_CONSOLE=$LOG_TO_CONSOLE
-          export WAN_IP_RETRY_ATTEMPTS=$WAN_IP_RETRY_ATTEMPTS
-          export WAN_IP_RETRY_COOLDOWN_SECONDS=$WAN_IP_RETRY_COOLDOWN_SECONDS
-          export ESDDNS_DAEMON_INTERVAL=$ESDDNS_DAEMON_INTERVAL
           pytest tests/ -rsA
