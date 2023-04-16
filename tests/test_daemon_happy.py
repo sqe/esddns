@@ -45,7 +45,8 @@ class DaemonAuthenticated(unittest.TestCase):
     def test_whisper_connection_success(self):
         expected_msg = 'DEBUG {}:443 "GET'
         for check_svc in self.ip_check_services:
-            look_for = urlparse(check_svc).scheme + "://" + urlparse(check_svc).hostname 
+            look_for = urlparse(check_svc).scheme + \
+                "://" + urlparse(check_svc).hostname 
             assert expected_msg.format(look_for) in self.scribe
 
     def test_whisper_ips_match(self):
