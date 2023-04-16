@@ -10,7 +10,7 @@ def daemon_whisper(cycle_stamp=None):
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        encoding="utf-8",
+        # encoding="utf-8",
         universal_newlines=True)
     while True:
         output_line = execute_command.stdout.readline()
