@@ -4,8 +4,17 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+      TARGET_DOMAIN_FQDN: ${{ vars.TARGET_DOMAIN_FQDN }}
+      RECORD_NAME_ROOT: ${{ vars.RECORD_NAME_ROOT }}
+      RECORD_TYPE_A: ${{ vars.RECORD_TYPE_A }}
+      RECORD_TTL: ${{ vars.RECORD_TTL }}
+      LOG_TO_CONSOLE: ${{ vars.LOG_TO_CONSOLE }}
+      WAN_IP_RETRY_ATTEMPTS: ${{ vars.WAN_IP_RETRY_ATTEMPTS }}
+      WAN_IP_RETRY_COOLDOWN_SECONDS: ${{ vars.WAN_IP_RETRY_COOLDOWN_SECONDS }}
+      ESDDNS_DAEMON_INTERVAL: ${{ vars.ESDDNS_DAEMON_INTERVAL }}
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -28,15 +37,6 @@ jobs:
           # default set of ruff rules with GitHub Annotations
           ruff --format=github --target-version=py37 .
       - name: Test with pytest
-        run: |
-          export API_KEY=${{ secrets.API_KEY }}
-          export TARGET_DOMAIN_FQDN=${{ vars.TARGET_DOMAIN_FQDN }}
-          export RECORD_NAME_ROOT=${{ vars.RECORD_NAME_ROOT }}
-          export RECORD_TYPE_A=${{ vars.RECORD_TYPE_A }}
-          export RECORD_TTL=${{ vars.RECORD_TTL }}
-          export LOG_TO_CONSOLE=${{ vars.LOG_TO_CONSOLE }}
-          export WAN_IP_RETRY_ATTEMPTS=${{ vars.WAN_IP_RETRY_ATTEMPTS }}
-          export WAN_IP_RETRY_COOLDOWN_SECONDS=${{ vars.WAN_IP_RETRY_COOLDOWN_SECONDS }}
-          export ESDDNS_DAEMON_INTERVAL=${{ vars.ESDDNS_DAEMON_INTERVAL }}        
-          echo $RECORD_NAME_ROOT $RECORD_TTL
+        run: |   
+          echo $RECORD_NAME_ROOT $RECORD_TTL $LOG_TO_CONSOLE
           pytest tests/ -rsA
