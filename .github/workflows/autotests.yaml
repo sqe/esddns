@@ -30,12 +30,13 @@ jobs:
       - name: Test with pytest
         run: |
           export API_KEY=${{ secrets.API_KEY }}
-          export TARGET_DOMAIN_FQDN=${{ vars.TARGET_DOMAIN_FQDN }}
-          export RECORD_NAME_ROOT=${{ vars.RECORD_NAME_ROOT }}
-          export RECORD_TYPE_A=${{ vars.RECORD_TYPE_A }}
-          export RECORD_TTL=${{ vars.RECORD_TTL }}
-          export LOG_TO_CONSOLE=${{ vars.LOG_TO_CONSOLE }}
-          export WAN_IP_RETRY_ATTEMPTS=${{ vars.WAN_IP_RETRY_ATTEMPTS }}
-          export WAN_IP_RETRY_COOLDOWN_SECONDS=${{ vars.WAN_IP_RETRY_COOLDOWN_SECONDS }}
-          export ESDDNS_DAEMON_INTERVAL=${{ vars.ESDDNS_DAEMON_INTERVAL }}        
+          export TARGET_DOMAIN_FQDN=${{ esddns.TARGET_DOMAIN_FQDN }}
+          export RECORD_NAME_ROOT=${{ esddns.RECORD_NAME_ROOT }}
+          export RECORD_TYPE_A=${{ esddns.RECORD_TYPE_A }}
+          export RECORD_TTL=${{ esddns.RECORD_TTL }}
+          export LOG_TO_CONSOLE=${{ esddns.LOG_TO_CONSOLE }}
+          export WAN_IP_RETRY_ATTEMPTS=${{ esddns.WAN_IP_RETRY_ATTEMPTS }}
+          export WAN_IP_RETRY_COOLDOWN_SECONDS=${{ esddns.WAN_IP_RETRY_COOLDOWN_SECONDS }}
+          export ESDDNS_DAEMON_INTERVAL=${{ esddns.ESDDNS_DAEMON_INTERVAL }}        
+          echo $RECORD_NAME_ROOT $RECORD_TTL
           pytest tests/ -rsA
