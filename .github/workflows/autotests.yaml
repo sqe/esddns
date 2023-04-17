@@ -38,5 +38,5 @@ jobs:
           ruff --format=github --target-version=py37 .
       - name: Test with pytest
         run: |   
-          echo ${{env.RECORD_NAME_ROOT}} ${{env.RECORD_TTL}} ${{env.LOG_TO_CONSOLE}}
+          echo ${{vars.RECORD_NAME_ROOT}} ${{vars.RECORD_TTL}} ${{vars.LOG_TO_CONSOLE}}
           pytest tests/ -rsA
