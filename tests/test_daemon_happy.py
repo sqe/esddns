@@ -21,10 +21,18 @@ class DaemonAuthenticated(unittest.TestCase):
         self.api_url_base = self.gandi_conf["api_url_base"]
         self.esddns_conf = dict(self.config["ESDDNS"])
         self.scribe = str(scribe())
-
+        self.sc = scribe()
     @classmethod
     def tearDown(self):
         pass
+    
+    def test_debug_print_error(self):
+            a = self.sc
+            ctr = 0
+            for s in a:
+                ctr = ctr + 1
+                print(ctr, s)
+            assert "Running scheduled daemon" in a
 
     def test_whisper_logo_footer(self):
         interval = int(self.esddns_conf["daemon_thread_interval"])
