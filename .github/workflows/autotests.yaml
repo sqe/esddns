@@ -5,6 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: esddns
     env:
       API_KEY: ${{ secrets.API_KEY }}
       TARGET_DOMAIN_FQDN: ${{ vars.TARGET_DOMAIN_FQDN }}
