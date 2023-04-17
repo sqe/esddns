@@ -37,6 +37,9 @@ jobs:
           ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
           # default set of ruff rules with GitHub Annotations
           ruff --format=github --target-version=py37 .
+      - name: export environment variables
+        run: |
+            env
       - name: Test with pytest
         run: |   
           echo ${{env.RECORD_NAME_ROOT}} ${{env.RECORD_TTL}} ${{env.LOG_TO_CONSOLE}}
