@@ -218,8 +218,11 @@ class DomainManagement:
         with self.s:
             all_records = json.loads(self.get_target_domain_records())
             for a_record in all_records: 
-                if a_record["rrset_type"] == os.environ[self.dns_config["record_type_a"]] \
-                    and a_record["rrset_name"] == os.environ[self.dns_config["record_name_root"]]:
+                if a_record["rrset_type"] == os.environ[
+                        self.dns_config["record_type_a"]] \
+                    and \
+                    a_record["rrset_name"] == \
+                        os.environ[self.dns_config["record_name_root"]]:
                     self.logger.info(self.dns_config["msg_dns_domain_a_record_root_found"].format(a_record))
                     return a_record
                 else:
@@ -375,10 +378,15 @@ class DomainManagement:
                 os.environ[self.dns_config["target_domain_fqdn"]]) + \
                 "/" + rrset_name + \
                 "/" + rrset_type
-            payload = json.dumps({"rrset_values": [rrset_value], "rrset_ttl": rrset_ttl})
+            payload = json.dumps(
+                {"rrset_values": [rrset_value], 
+                 "rrset_ttl": rrset_ttl})
             overwrite_record_request = self.s.put(url, data=payload, headers=header)
-            overwrite_record_request_response = json.dumps(overwrite_record_request.json())
-            return overwrite_record_request_response, overwrite_record_request.status_code
+            overwrite_record_request_response = json.dumps(
+                overwrite_record_request.json())
+            return \
+                overwrite_record_request_response, \
+                overwrite_record_request.status_code
 
     def update_a_record(self, ip=None):
         """Updates A record with `overwrite_record()` function, supply 

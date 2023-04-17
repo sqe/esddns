@@ -199,7 +199,8 @@ class WANIPState:
             maximum amount of concurrent worker threads to utilize.
         """
         with ThreadPoolExecutor(max_workers=len(self.ip_check_services)) as executor:
-            jobs = [executor.submit(self.get_wan_ip, svc) for svc in self.ip_check_services]
+            jobs = [executor.submit(
+                self.get_wan_ip, svc) for svc in self.ip_check_services]
             for job in as_completed(jobs):
                 if job.result()[0] is None:
                     continue

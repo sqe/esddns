@@ -21,7 +21,7 @@ class DaemonAuthenticated(unittest.TestCase):
         self.api_url_base = self.gandi_conf["api_url_base"]
         self.esddns_conf = dict(self.config["ESDDNS"])
         self.scribe = str(scribe())
-
+        
     @classmethod
     def tearDown(self):
         pass
@@ -45,7 +45,8 @@ class DaemonAuthenticated(unittest.TestCase):
     def test_whisper_connection_success(self):
         expected_msg = 'DEBUG {}:443 "GET'
         for check_svc in self.ip_check_services:
-            look_for = urlparse(check_svc).scheme + "://" + urlparse(check_svc).hostname 
+            look_for = urlparse(check_svc).scheme + \
+                "://" + urlparse(check_svc).hostname 
             assert expected_msg.format(look_for) in self.scribe
 
     def test_whisper_ips_match(self):
@@ -65,6 +66,7 @@ class DaemonAuthenticated(unittest.TestCase):
     def test_whisper_gandi_target_domain_found(self):
         assert self.gandi_conf["msg_dns_domain_found"].format(
             os.environ.get("TARGET_DOMAIN_FQDN")) in self.scribe
-
+        
+    @unittest.skip("esddns is applying real WAN IP of github action runners")
     def test_whisper_states_are_in_sync(self):
         assert self.esddns_conf["msg_ip_dns_in_sync"][:-3] in self.scribe 
