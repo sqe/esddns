@@ -146,7 +146,6 @@ def render_page():
 
 if __name__ == '__main__':
     app.run(
-        debug=True, 
         host=config["ESDDNS"]["service_host"], 
         port=config["ESDDNS"]["service_port"], 
         threaded=True)

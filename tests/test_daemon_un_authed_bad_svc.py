@@ -1,5 +1,4 @@
 import unittest
-import os
 from configparser import ConfigParser
 import json
 from utils.scribe_daemon import daemon_whisper as scribe
@@ -17,7 +16,11 @@ class DaemonUnAuthedBadService(unittest.TestCase):
         self.ip_conf = dict(self.config["WANIPState"])
         self.esddns_conf = dict(self.config["ESDDNS"])
         self.ip_check_services = {"svc": ["https://aapi.ipify.org/?format=text"]}
-        self.config.set("WANIPState","ip_check_services", json.dumps(self.ip_check_services))
+        self.config.set(
+            "WANIPState",
+            "ip_check_services",
+            json.dumps(self.ip_check_services))
+
         with open("dns.ini", "w") as ini:
             self.config.write(ini)
 
