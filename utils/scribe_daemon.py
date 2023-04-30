@@ -4,8 +4,7 @@ def daemon_whisper(cycle_stamp=None):
     cycle_stamp = "Next scheduled run in "
     transcribe_cycle = []
     execute_command = subprocess.Popen(
-        ["python3", "esddns.py"],
-        shell=False,
+        ["/usr/bin/python3", "esddns.py"],
         text=True,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
