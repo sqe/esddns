@@ -82,7 +82,6 @@ def global_cache():
     Returns:
         dict: `g_cached_state`
     """
-    global g_cached_state
     return g_cached_state
 
 def current_state():
