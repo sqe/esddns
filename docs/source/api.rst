@@ -20,6 +20,22 @@ api.get\_ip module
    :undoc-members:
    :show-inheritance:
 
+api.get\_ip\_stun module
+-------------------------------
+
+.. automodule:: api.get_ip_stun
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+api.async\_stun\_discovery module
+-----------------------------------------
+
+.. automodule:: api.async_stun_discovery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 api.logs module
 ----------------------
 

@@ -68,98 +68,191 @@
            <div itemprop="articleBody">
              
   <h1>Source code for api.get_ip</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
-<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
-<span class="kn">from</span> <span class="nn">logs</span> <span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
-<span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="kn">import</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">HTTPError</span>
-<span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="kn">import</span> <span class="n">RequestException</span> <span class="k">as</span> <span class="n">RequestException</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">import</span> <span class="nn">configparser</span>
-<span class="kn">import</span> <span class="nn">ipaddress</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">sys</span> 
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_completed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logs</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">requests.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">HTTPError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">requests.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestException</span> <span class="k">as</span> <span class="n">RequestException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">configparser</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<div class="viewcode-block" id="WANIPState"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState">[docs]</a><span class="k">class</span> <span class="nc">WANIPState</span><span class="p">:</span>
+<span class="c1"># Optional STUN support</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.get_ip_stun</span><span class="w"> </span><span class="kn">import</span> <span class="n">STUNProvider</span>
+    <span class="n">STUN_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">STUN_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STUN not available: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> 
+
+<div class="viewcode-block" id="WANIPState"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">WANIPState</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Class to retrieve Public WAN IP from multiple external sources </span>
-<span class="sd">    and return as a State</span>
+<span class="sd">    (STUN protocol and/or HTTP services) and return as a State</span>
+
+<span class="sd">    IP Discovery Methods (Configurable):</span>
+<span class="sd">    </span>
+<span class="sd">        STUN Protocol (Optional):</span>
+<span class="sd">            Enabled when [STUNConfig] section exists in dns.ini</span>
+<span class="sd">            Uses RFC 8489 compliant STUN protocol over UDP and TCP</span>
+<span class="sd">            Async/concurrent queries to multiple STUN servers</span>
+<span class="sd">            Retry logic with exponential backoff</span>
+<span class="sd">            Typically ~2x faster than HTTP services</span>
+<span class="sd">            </span>
+<span class="sd">        HTTP Services (Optional):</span>
+<span class="sd">            Enabled when [WANIPState] section exists in dns.ini</span>
+<span class="sd">            Multi-threaded concurrent HTTP requests to external IP check services</span>
+<span class="sd">            Retry logic for transient failures (HTTP status codes: 408, 429, 449, 500, 502, 503, 504, 509)</span>
+<span class="sd">            </span>
+<span class="sd">        Note: At least one method ([STUNConfig] or [WANIPState]) must be configured.</span>
+<span class="sd">              Both can be enabled for redundancy - STUN runs first, HTTP verifies.</span>
 
 <span class="sd">    Methods:</span>
 
 <span class="sd">    __init__(self):</span>
-<span class="sd">        Initiates Dynamic multi-threaded extraction of valid Public WAN IPs </span>
-<span class="sd">        from services and creates a updates the list `self.ipaddress_list` </span>
-<span class="sd">        upon IPv4 address discovery.</span>
+<span class="sd">        Initiates WANIPState class and performs IP discovery.</span>
 
-<span class="sd">        Defaults:</span>
-
-<span class="sd">            `self.config` : Object instance</span>
-<span class="sd">                ConfigParser instance</span>
-<span class="sd">            `self.config.read(&#39;dns.ini&#39;)`: file </span>
-<span class="sd">                Configuration file</span>
-<span class="sd">            `self.ip_conf` : dict</span>
-<span class="sd">                dictionary of variables of WANIPState section from configuration file</span>
-<span class="sd">            `self.ip_check_services` : list </span>
-<span class="sd">                list from dictionary of external ip check services from self.ip_conf</span>
-<span class="sd">            `self.retry_attempts`: int</span>
-<span class="sd">                number of retry attempts </span>
-<span class="sd">            `self.retry_interval`: int</span>
-<span class="sd">                cooldown interval, multiplied to retry attempt on each iteration</span>
-<span class="sd">                list to store WAN IP addresses collected from supplied services</span>
-<span class="sd">            `self.ipaddress_list`: list</span>
-<span class="sd">                collected IPs, defaults to Empty</span>
-<span class="sd">            `self.ips_extraction()`: method</span>
-<span class="sd">               adds extracted IPs to discovered ipaddresses list ipaddress_list</span>
-<span class="sd">            `self._wan_ip_state`: dict </span>
-<span class="sd">                defatult local mutable WAN IP State containing usable state of </span>
-<span class="sd">                `{&quot;wan_ip_state&quot; : {&quot;usable&quot; : False, &quot;IP&quot;: {}}}`</span>
+<span class="sd">        Configuration Loading:</span>
+<span class="sd">            `self.config` : ConfigParser instance</span>
+<span class="sd">            `self.config.read(&#39;dns.ini&#39;)` : Loads configuration file</span>
+<span class="sd">            </span>
+<span class="sd">        HTTP Services (if [WANIPState] exists):</span>
+<span class="sd">            `self.http_enabled` : bool - True if HTTP services configured</span>
+<span class="sd">            `self.ip_conf` : dict - WANIPState section variables</span>
+<span class="sd">            `self.ip_check_services` : list - External HTTP IP check service URLs</span>
+<span class="sd">            `self.retry_attempts` : int - Number of retry attempts (default: 3)</span>
+<span class="sd">            `self.retry_interval` : int - Cooldown interval in seconds (default: 5)</span>
+<span class="sd">            `self.s` : requests.Session - HTTP session for requests</span>
+<span class="sd">            </span>
+<span class="sd">        STUN Protocol (if [STUNConfig] exists and module available):</span>
+<span class="sd">            `self.stun_enabled` : bool - True if STUN protocol configured</span>
+<span class="sd">            `self.stun_provider` : STUNProvider - STUN query handler</span>
+<span class="sd">            Queries multiple STUN servers concurrently (UDP and TCP)</span>
+<span class="sd">            Retry logic with exponential backoff</span>
+<span class="sd">            </span>
+<span class="sd">        Common:</span>
+<span class="sd">            `self.ipaddress_list` : list - Collected valid IPs from all sources</span>
+<span class="sd">            `self._wan_ip_state` : dict - `{&quot;wan_ip_state&quot;: {&quot;usable&quot;: False, &quot;IP&quot;: {}}}`</span>
+<span class="sd">            `self.ips_extraction()` : Executes IP discovery from configured sources</span>
 
 <span class="sd">    __call__(self):</span>
 <span class="sd">        Functor to return WAN IP State when WANIPState() class is called</span>
+<span class="sd">        Returns: self.wan_ip_state()</span>
 
 <span class="sd">    retry_request(self, svc, func=None)</span>
-<span class="sd">        Decorator for request retry function func on external service, </span>
-<span class="sd">        used if an external service is in flaky state but with retriable </span>
-<span class="sd">        http status code.</span>
+<span class="sd">        HTTP retry decorator for request function on external service.</span>
+<span class="sd">        Used when HTTP service returns retriable status codes.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            svc (str): External service URL</span>
+<span class="sd">            func (function): Function to retry</span>
 <span class="sd">    </span>
-<span class="sd">    get_wan_ip(sefl, svc=None)   </span>
-<span class="sd">        Retrieves Public WAN IP from external service.</span>
-<span class="sd">        Retries if HTTP STATUS CODE is in list:[408, 429, 449, 500, 502, 503, 504, 509]</span>
-<span class="sd">        Gracefully exits in Request Exceptions</span>
+<span class="sd">    get_wan_ip(self, svc=None)   </span>
+<span class="sd">        Retrieves Public WAN IP from external HTTP service.</span>
+<span class="sd">        Retries if HTTP STATUS CODE is in list: [408, 429, 449, 500, 502, 503, 504, 509]</span>
+<span class="sd">        Gracefully handles Request Exceptions</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (IP, service) - IPv4 string and service URL, or (None, service) on failure</span>
 
 <span class="sd">    ips_extraction(self)</span>
-<span class="sd">        Dynamic multi-threaded extraction of valid Public WAN IPs from services </span>
-<span class="sd">        via get_wan_ip method.</span>
-<span class="sd">        Adds extracted IPs to discovered ipaddresses list ipaddress_list</span>
-<span class="sd">        Gracefully skips if IP is malformed, or if WAN IP is not Globally Reachable </span>
-<span class="sd">        https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml</span>
+<span class="sd">        Executes IP discovery from configured sources with priority order.</span>
+<span class="sd">        </span>
+<span class="sd">        Priority Order:</span>
+<span class="sd">            1. STUN Protocol (if enabled) - Queries STUN servers with retry logic</span>
+<span class="sd">            2. HTTP Services (if enabled) - Multi-threaded HTTP queries with retry logic</span>
+<span class="sd">            </span>
+<span class="sd">        Validation:</span>
+<span class="sd">            - Validates IPv4 format using ipaddress.IPv4Address</span>
+<span class="sd">            - Checks global reachability (filters private/reserved IPs)</span>
+<span class="sd">            - See: https://www.iana.org/assignments/iana-ipv4-special-registry/</span>
+<span class="sd">            </span>
+<span class="sd">        Behavior:</span>
+<span class="sd">            - Failed queries returning None are filtered out</span>
+<span class="sd">            - Adds all valid IPs to self.ipaddress_list</span>
+<span class="sd">            - Skips gracefully on malformed or non-global IPs</span>
 
 <span class="sd">    wan_ip_state(self)</span>
-<span class="sd">        WAN IP State dictionary, contains &quot;usable&quot; state (True or False) and,</span>
-<span class="sd">        Validated Globally Reachable WAN IP or empty value. Gracefully skips and exits </span>
-<span class="sd">        if Unable to collect any IPs or if Collected IP addresses do not match    </span>
+<span class="sd">        Returns WAN IP State dictionary with validation of all collected IPs.</span>
+<span class="sd">        </span>
+<span class="sd">        Validation Logic:</span>
+<span class="sd">            - Compares all IPs in ipaddress_list (from STUN and/or HTTP)</span>
+<span class="sd">            - All IPs must match or only one IP collected</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: `{&quot;wan_ip_state&quot;: {&quot;usable&quot;: True/False, &quot;IP&quot;: &quot;x.x.x.x&quot; or {}}}`</span>
+<span class="sd">            </span>
+<span class="sd">        Cases:</span>
+<span class="sd">            Multiple IPs Match: usable=True (e.g., STUN + 2 HTTP all return same IP)</span>
+<span class="sd">            Single IP Collected: usable=True (e.g., only STUN succeeded)</span>
+<span class="sd">            IP Mismatch: usable=False, exits (e.g., STUN=1.2.3.4, HTTP=5.6.7.8)</span>
+<span class="sd">            No IPs Collected: usable=False, exits</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiates WANIPState class</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initializing variables and class methods</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;dns.ini&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;WANIPState&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;ip_check_services&quot;</span><span class="p">])[</span><span class="s2">&quot;svc&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;retry_cooldown_seconds&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;retry_attempts&quot;</span><span class="p">])</span>
+        
         <span class="c1"># Initializing logging</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
-        <span class="c1"># Initialize HTTP Request session</span>
+        
+        <span class="c1"># Check if WANIPState section exists (HTTP services)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">http_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="s2">&quot;WANIPState&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;WANIPState&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;ip_check_services&quot;</span><span class="p">])[</span><span class="s2">&quot;svc&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;retry_cooldown_seconds&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;retry_attempts&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">http_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;HTTP-based IP services enabled&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Set defaults for when HTTP is disabled</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;msg_ip_invalid&quot;</span><span class="p">:</span> <span class="s2">&quot;SKIPPING: Invalid IPv4 address: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;msg_ip_non_global&quot;</span><span class="p">:</span> <span class="s2">&quot;SKIPPING: IPv4 is not Globally Reachable </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;msg_missmatch&quot;</span><span class="p">:</span> <span class="s2">&quot;CRITICAL: </span><span class="si">{}</span><span class="s2"> Mismatch in IPv4 addresses </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;msg_success_from_all&quot;</span><span class="p">:</span> <span class="s2">&quot;SUCCESS: IPv4 addresses match! </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;msg_success_from_one&quot;</span><span class="p">:</span> <span class="s2">&quot;SUCCESS: IP collected! </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;msg_ip_not_collected&quot;</span><span class="p">:</span> <span class="s2">&quot;CRITICAL: Unable to collect IPv4 address&quot;</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span> <span class="o">=</span> <span class="mi">5</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;HTTP-based IP services disabled (no [WANIPState] section)&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize HTTP Request session (even if HTTP disabled, for potential future use)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        
         <span class="c1"># WAN IP address list from supplied services</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ipaddress_list</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># Check if STUN is configured and available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stun_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stun_provider</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">STUN_AVAILABLE</span> <span class="ow">and</span> <span class="s2">&quot;STUNConfig&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stun_provider</span> <span class="o">=</span> <span class="n">STUNProvider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;stun&quot;</span><span class="p">,</span> <span class="n">cfgfile</span><span class="o">=</span><span class="s2">&quot;dns.ini&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stun_enabled</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;STUN protocol enabled for IP discovery&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STUN provider initialization failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, falling back to HTTP services&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Validate at least one method is enabled</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stun_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_enabled</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;CRITICAL: Neither STUN nor HTTP IP discovery methods are configured!&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">ips_extraction</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wan_ip_state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wan_ip_state&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;usable&quot;</span> <span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;IP&quot;</span><span class="p">:</span> <span class="p">{}}}</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Functor to return WAN IP State</span>
 
 <span class="sd">        Returns:</span>
@@ -167,7 +260,7 @@
 <span class="sd">            which holds WAN IP State dictionary when WANIPState() class is called</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wan_ip_state</span><span class="p">()</span>
-<div class="viewcode-block" id="WANIPState.retry_request"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.retry_request">[docs]</a>    <span class="k">def</span> <span class="nf">retry_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svc</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="WANIPState.retry_request"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.retry_request">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">retry_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svc</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator for request retry function func on external service svc, </span>
 <span class="sd">        Used if an external service is in flaky state but with retriable </span>
 <span class="sd">        http status code.</span>
@@ -193,7 +286,7 @@
             <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span><span class="p">)</span>
             <span class="n">func</span></div>
 
-<div class="viewcode-block" id="WANIPState.get_wan_ip"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.get_wan_ip">[docs]</a>    <span class="k">def</span> <span class="nf">get_wan_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="WANIPState.get_wan_ip"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.get_wan_ip">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_wan_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves Public WAN IP from external service.</span>
 <span class="sd">        Retries if HTTP STATUS CODE is in list:[408, 429, 449, 500, 502, 503, 504, 509]</span>
 <span class="sd">        Gracefully exits on Request Exceptions, skips if IP address not IPv4 compliant </span>
@@ -249,7 +342,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span></div>
        
-<div class="viewcode-block" id="WANIPState.ips_extraction"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.ips_extraction">[docs]</a>    <span class="k">def</span> <span class="nf">ips_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="WANIPState.ips_extraction"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.ips_extraction">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">ips_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dynamic multi-threaded extraction of valid Public WAN IPs from services </span>
 <span class="sd">        via get_wan_ip method.</span>
 
@@ -268,25 +361,42 @@
 <span class="sd">            value : length of self.ip_check_services list</span>
 <span class="sd">            maximum amount of concurrent worker threads to utilize.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span><span class="p">))</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-            <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_wan_ip</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span> <span class="k">for</span> <span class="n">svc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">jobs</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">job_result_ip</span><span class="p">,</span> <span class="n">job_result_svc</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-                <span class="n">ip_address</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">job_result_ip</span><span class="p">)</span>
-                <span class="n">ip_format_check</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip_address</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">job_result_ip</span> <span class="o">!=</span> <span class="n">ip_format_check</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;msg_ip_invalid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">job_result_ip</span><span class="p">))</span>
-                    <span class="k">continue</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">ip_address</span><span class="o">.</span><span class="n">is_global</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;msg_ip_non_global&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">ip_address</span><span class="p">))</span>
-                    <span class="k">continue</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ipaddress_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job_result_ip</span><span class="p">)</span></div>
+        <span class="c1"># Try STUN first if enabled</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stun_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stun_provider</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stun_ip</span><span class="p">,</span> <span class="n">stun_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stun_provider</span><span class="o">.</span><span class="n">get_wan_ip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">stun_ip</span><span class="p">:</span>
+                    <span class="n">ip_address</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">stun_ip</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ip_address</span><span class="o">.</span><span class="n">is_global</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SUCCESS: STUN returned </span><span class="si">{</span><span class="n">stun_ip</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">stun_service</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ipaddress_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stun_ip</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STUN IP </span><span class="si">{</span><span class="n">stun_ip</span><span class="si">}</span><span class="s2"> is not globally reachable, trying HTTP services&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;STUN query failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, falling back to HTTP services&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Proceed with HTTP services (as fallback or additional verification)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span><span class="p">))</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+                <span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_wan_ip</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span> <span class="k">for</span> <span class="n">svc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_check_services</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">jobs</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">job_result_ip</span><span class="p">,</span> <span class="n">job_result_svc</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                    <span class="n">ip_address</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">job_result_ip</span><span class="p">)</span>
+                    <span class="n">ip_format_check</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip_address</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">job_result_ip</span> <span class="o">!=</span> <span class="n">ip_format_check</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;msg_ip_invalid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">job_result_ip</span><span class="p">))</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">ip_address</span><span class="o">.</span><span class="n">is_global</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_conf</span><span class="p">[</span><span class="s2">&quot;msg_ip_non_global&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">ip_address</span><span class="p">))</span>
+                        <span class="k">continue</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ipaddress_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job_result_ip</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="WANIPState.wan_ip_state"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.wan_ip_state">[docs]</a>    <span class="k">def</span> <span class="nf">wan_ip_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="WANIPState.wan_ip_state"><a class="viewcode-back" href="../../api.html#api.get_ip.WANIPState.wan_ip_state">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">wan_ip_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns WAN IP State dictionary, contains  usable state (True or False) and,</span>
 <span class="sd">        Validated Globally Reachable WAN IP or empty value.</span>
 

@@ -1,3 +1,6 @@
+# STUN-ONLY Configuration Example
+# Comment out or remove [WANIPState] section to test STUN-only mode
+
 [gandi]
 api_key = API_KEY
 api_url_base = https://api.gandi.net
@@ -24,22 +27,23 @@ msg_dns_a_record_overwrite = "Synchronizing A record state's IPv4 with IPv4 from
 msg_dns_a_record_validate = "Validating IPv4 from A record state: {} vs IPv4 from wan_ip_state: {}"
 msg_dns_a_record_state_ip_not_synced = "IPs do not match, a_record_state: {}"
 
-[WANIPState]
-ip_check_services = {"svc": ["https://api.ipify.org/?format=text", "https://checkip.amazonaws.com/", "https://ifconfig.me/ip"]}
-msg_close_connection = "OK: Connection closed: {}"
-msg_connection_error = "SKIPPING: Please check if service is accessible: {}; Error:{}"
-msg_http_error = "SKIPPING: Couldn't retrieve WAN IPv4 from Service {}; Status Code {}"
-msg_ip_found = "SUCCESS: {} Returned: {} as your WAN IPv4"
-msg_ip_invalid = "SKIPPING: Invalid IPv4 address: {}; from: {}"
-msg_ip_non_ipv4 = "SKIPPING: Non IPv4 returned {} {}"
-msg_ip_not_collected = "CRITICAL: Unable to collect IPv4 address from: {}"
-msg_ip_non_global = "SKIPPING: IPv4 is not Globally Reachable {}"
-msg_missmatch = "CRITICAL: {} Mismatch in IPv4 addresses, please retry later or change service {}"
-msg_retry_request = "RETRY: Attempt #{}; Cooldown {} seconds; Service {}"
-msg_success_from_all = "SUCCESS: IPv4 addresses from external services match! {}"
-msg_success_from_one = "SUCCESS: At least one IPv4 was collected! {}"
-retry_attempts = 3
-retry_cooldown_seconds = 5
+# [WANIPState] section commented out to test STUN-only mode
+# [WANIPState]
+# ip_check_services = {"svc": ["https://api.ipify.org/?format=text", "https://checkip.amazonaws.com/", "https://ifconfig.me/ip"]}
+# msg_close_connection = "OK: Connection closed: {}"
+# msg_connection_error = "SKIPPING: Please check if service is accessible: {}; Error:{}"
+# msg_http_error = "SKIPPING: Couldn't retrieve WAN IPv4 from Service {}; Status Code {}"
+# msg_ip_found = "SUCCESS: {} Returned: {} as your WAN IPv4"
+# msg_ip_invalid = "SKIPPING: Invalid IPv4 address: {}; from: {}"
+# msg_ip_non_ipv4 = "SKIPPING: Non IPv4 returned {} {}"
+# msg_ip_not_collected = "CRITICAL: Unable to collect IPv4 address from: {}"
+# msg_ip_non_global = "SKIPPING: IPv4 is not Globally Reachable {}"
+# msg_missmatch = "CRITICAL: {} Mismatch in IPv4 addresses, please retry later or change service {}"
+# msg_retry_request = "RETRY: Attempt #{}; Cooldown {} seconds; Service {}"
+# msg_success_from_all = "SUCCESS: IPv4 addresses from external services match! {}"
+# msg_success_from_one = "SUCCESS: At least one IPv4 was collected! {}"
+# retry_attempts = 3
+# retry_cooldown_seconds = 5
 
 [log]
 log_file = esddns.log
@@ -51,7 +55,7 @@ msg_dns_not_in_sync = "DNS A record state is out of sync: {}"
 msg_dns_update = "Updating DNS A record's IP with current WAN IP: {}"
 msg_dns_update_success = "SUCCESS: A Record has been updated {}"
 msg_dns_update_fail = "Critical: Could not update A Record: Request: {} Status Code: {}"
-daemon_thread_interval = 300
+daemon_thread_interval = 15
 service_host = "0.0.0.0"
 service_port = "51139"
 msg_daemon_scheduled = "ESDDNS Standalone scheduler started!"
@@ -62,10 +66,10 @@ msg_daemon_next_exec = "Next scheduled run in {} seconds"
 udp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts.txt
 tcp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts_tcp.txt
 bind_request = 1
+; 0x2112A442 as decimal is 554869826
 magic_cookie = 554869826
 xor_mapped_address = 32
-udp_limit = 5
-tcp_limit = 5
+udp_limit = 10
+tcp_limit = 10
 retry_attempts = 3
 retry_cooldown_seconds = 5
-

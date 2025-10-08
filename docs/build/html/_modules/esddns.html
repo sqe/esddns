@@ -68,15 +68,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for esddns</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
-<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
-<span class="kn">from</span> <span class="nn">api.dns_manager</span> <span class="kn">import</span> <span class="n">DomainManagement</span> 
-<span class="kn">from</span> <span class="nn">api.get_ip</span> <span class="kn">import</span> <span class="n">WANIPState</span> 
-<span class="kn">from</span> <span class="nn">api.logs</span> <span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">configparser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.dns_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DomainManagement</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.get_ip</span><span class="w"> </span><span class="kn">import</span> <span class="n">WANIPState</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.logs</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<div class="viewcode-block" id="ESDDNS"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS">[docs]</a><span class="k">class</span> <span class="nc">ESDDNS</span><span class="p">:</span>
+<div class="viewcode-block" id="ESDDNS"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ESDDNS</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Class to Synchronize WAN IP and DNS Record states</span>
 
 <span class="sd">    - When ESDDNS is ran directly from shell by executing: ``python esddns.py``</span>
@@ -110,7 +110,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes ESDDNS class</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
@@ -120,7 +120,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wan_ip_state</span> <span class="o">=</span> <span class="n">WANIPState</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Functor to return dynamic union of WAN IP and DNS A Record States</span>
 
 <span class="sd">        Returns:</span>
@@ -129,7 +129,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_states</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ESDDNS.sync_states"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS.sync_states">[docs]</a>    <span class="k">def</span> <span class="nf">sync_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ESDDNS.sync_states"><a class="viewcode-back" href="../esddns.html#esddns.ESDDNS.sync_states">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">sync_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Manages both WAN IP and DNS A Records States for synchronization.</span>
 <span class="sd">        Updates DNS A Record&#39;s IP address if it&#39;s out of sync.</span>
 <span class="sd">        Logs each transaction.</span>

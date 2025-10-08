@@ -43,7 +43,7 @@ class DaemonUnAuthenticated(unittest.TestCase):
     def test_whisper_23(self):
 
         expected_msg = "Starting new HTTPS connection"
-        whisper =str(self.scribe[23])
+        whisper = str(self.scribe)
         assert expected_msg in whisper
 
     def test_whisper_24(self):

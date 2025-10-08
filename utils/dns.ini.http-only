@@ -1,3 +1,6 @@
+# HTTP-ONLY Configuration Example
+# Comment out or remove [STUNConfig] section to test HTTP-only mode
+
 [gandi]
 api_key = API_KEY
 api_url_base = https://api.gandi.net
@@ -51,21 +54,20 @@ msg_dns_not_in_sync = "DNS A record state is out of sync: {}"
 msg_dns_update = "Updating DNS A record's IP with current WAN IP: {}"
 msg_dns_update_success = "SUCCESS: A Record has been updated {}"
 msg_dns_update_fail = "Critical: Could not update A Record: Request: {} Status Code: {}"
-daemon_thread_interval = 300
+daemon_thread_interval = 15
 service_host = "0.0.0.0"
 service_port = "51139"
 msg_daemon_scheduled = "ESDDNS Standalone scheduler started!"
 msg_daemon_exec = "Running scheduled daemon thread!"
 msg_daemon_next_exec = "Next scheduled run in {} seconds"
 
-[STUNConfig]
-udp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts.txt
-tcp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts_tcp.txt
-bind_request = 1
-magic_cookie = 554869826
-xor_mapped_address = 32
-udp_limit = 5
-tcp_limit = 5
-retry_attempts = 3
-retry_cooldown_seconds = 5
-
+# [STUNConfig] section commented out to test HTTP-only mode
+# [STUNConfig]
+# udp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts.txt
+# tcp_host_list_url = https://raw.githubusercontent.com/pradt2/always-online-stun/master/valid_hosts_tcp.txt
+# bind_request = 1
+# ; 0x2112A442 as decimal is 554869826
+# magic_cookie = 554869826
+# xor_mapped_address = 32
+# udp_limit = 10
+# tcp_limit = 10
