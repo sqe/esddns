@@ -5,7 +5,7 @@ This module provides mocking capabilities to simulate STUN protocol responses
 without requiring actual network connections or external services during testing.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from typing import List, Tuple, Optional
 
 

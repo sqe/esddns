@@ -1,6 +1,5 @@
 import unittest
 import os
-import shutil
 from configparser import ConfigParser
 from utils.scribe_daemon import daemon_whisper as scribe
 

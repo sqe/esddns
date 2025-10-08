@@ -13,9 +13,6 @@ References:
 Sample usage:
     python async_stun_discovery.py
 
-Author: Your Name
-Date: 2025-10-07
-
 -----------------------------------------------------------------------------
 
 Relevant RFC 8489 Example:
@@ -319,7 +316,10 @@ class AsyncSTUNDiscovery:
                         if not line or ':' not in line: continue
                         host, port_str = line.split(':', 1)
                         try:
-                            hosts.append((host, int(port_str)))
+                            hosts.append(
+                                (host, 
+                                 int(port_str)
+                                 ))
                         except Exception:
                             self.logger.warning(f"Skipping malformed line: {line}")
             self.logger.info(f"Loaded {len(hosts)} hosts from {url}")
