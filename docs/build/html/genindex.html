@@ -71,6 +71,7 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
@@ -79,9 +80,10 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
@@ -96,6 +98,13 @@
 
       <ul>
         <li><a href="api.html#module-api">module</a>
+</li>
+      </ul></li>
+      <li>
+    api.async_stun_discovery
+
+      <ul>
+        <li><a href="api.html#module-api.async_stun_discovery">module</a>
 </li>
       </ul></li>
       <li>
@@ -115,31 +124,54 @@
 </li>
       </ul></li>
       <li>
+    api.get_ip_stun
+
+      <ul>
+        <li><a href="api.html#module-api.get_ip_stun">module</a>
+</li>
+      </ul></li>
+      <li>
     api.logs
 
       <ul>
         <li><a href="api.html#module-api.logs">module</a>
 </li>
       </ul></li>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery">AsyncSTUNDiscovery (class in api.async_stun_discovery)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.build_stun_binding_request">build_stun_binding_request() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#api.dns_manager.DomainManagement.create_a_record">create_a_record() (api.dns_manager.DomainManagement method)</a>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient.connection_lost">connection_lost() (api.async_stun_discovery.STUNDatagramClient method)</a>
+</li>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient.connection_made">connection_made() (api.async_stun_discovery.STUNDatagramClient method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#api.dns_manager.DomainManagement.create_record">create_record() (api.dns_manager.DomainManagement method)</a>
+      <li><a href="api.html#api.dns_manager.DomainManagement.create_a_record">create_a_record() (api.dns_manager.DomainManagement method)</a>
 </li>
-      <li><a href="esddns_service.html#esddns_service.esddns_endpoint.current_state">current_state() (in module esddns_service.esddns_endpoint)</a>
+      <li><a href="api.html#api.dns_manager.DomainManagement.create_record">create_record() (api.dns_manager.DomainManagement method)</a>
 </li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient.datagram_received">datagram_received() (api.async_stun_discovery.STUNDatagramClient method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#api.dns_manager.DomainManagement">DomainManagement (class in api.dns_manager)</a>
 </li>
@@ -149,6 +181,8 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient.error_received">error_received() (api.async_stun_discovery.STUNDatagramClient method)</a>
+</li>
       <li>
     esddns
 
@@ -156,6 +190,8 @@
         <li><a href="esddns.html#module-0">module</a>, <a href="esddns.html#module-esddns">[1]</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="esddns.html#esddns.ESDDNS">ESDDNS (class in esddns)</a>, <a href="esddns.html#id0">[1]</a>
 </li>
       <li>
@@ -163,15 +199,6 @@
 
       <ul>
         <li><a href="esddns_service.html#module-esddns_service">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    esddns_service.esddns_endpoint
-
-      <ul>
-        <li><a href="esddns_service.html#module-esddns_service.esddns_endpoint">module</a>
 </li>
       </ul></li>
       <li><a href="api.html#api.dns_manager.DomainManagement.exception_handler">exception_handler() (api.dns_manager.DomainManagement method)</a>
@@ -184,18 +211,24 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#api.dns_manager.DomainManagement.get_all_domains">get_all_domains() (api.dns_manager.DomainManagement method)</a>
 </li>
-      <li><a href="api.html#api.dns_manager.DomainManagement.get_target_domain_a_records">get_target_domain_a_records() (api.dns_manager.DomainManagement method)</a>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient.get_response">get_response() (api.async_stun_discovery.STUNDatagramClient method)</a>
 </li>
-      <li><a href="api.html#api.dns_manager.DomainManagement.get_target_domain_records">get_target_domain_records() (api.dns_manager.DomainManagement method)</a>
+      <li><a href="api.html#api.get_ip_stun.get_stun_ip_results">get_stun_ip_results() (in module api.get_ip_stun)</a>
+</li>
+      <li><a href="api.html#api.dns_manager.DomainManagement.get_target_domain_a_records">get_target_domain_a_records() (api.dns_manager.DomainManagement method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.dns_manager.DomainManagement.get_target_domain_records">get_target_domain_records() (api.dns_manager.DomainManagement method)</a>
+</li>
       <li><a href="api.html#api.dns_manager.DomainManagement.get_target_domain_url">get_target_domain_url() (api.dns_manager.DomainManagement method)</a>
 </li>
       <li><a href="api.html#api.get_ip.WANIPState.get_wan_ip">get_wan_ip() (api.get_ip.WANIPState method)</a>
+
+      <ul>
+        <li><a href="api.html#api.get_ip_stun.STUNProvider.get_wan_ip">(api.get_ip_stun.STUNProvider method)</a>
 </li>
-      <li><a href="esddns_service.html#esddns_service.esddns_endpoint.global_cache">global_cache() (in module esddns_service.esddns_endpoint)</a>
-</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -210,6 +243,10 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.load_host_list">load_host_list() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#api.logs.logger">logger() (in module api.logs)</a>
 </li>
   </ul></td>
@@ -218,6 +255,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.main">main() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
+</li>
       <li><a href="api.html#api.dns_manager.DomainManagement.manage_a_record">manage_a_record() (api.dns_manager.DomainManagement method)</a>
 </li>
       <li>
@@ -226,17 +265,19 @@
       <ul>
         <li><a href="api.html#module-api">api</a>
 </li>
+        <li><a href="api.html#module-api.async_stun_discovery">api.async_stun_discovery</a>
+</li>
         <li><a href="api.html#module-api.dns_manager">api.dns_manager</a>
 </li>
         <li><a href="api.html#module-api.get_ip">api.get_ip</a>
+</li>
+        <li><a href="api.html#module-api.get_ip_stun">api.get_ip_stun</a>
 </li>
         <li><a href="api.html#module-api.logs">api.logs</a>
 </li>
         <li><a href="esddns.html#module-0">esddns</a>, <a href="esddns.html#module-esddns">[1]</a>
 </li>
         <li><a href="esddns_service.html#module-esddns_service">esddns_service</a>
-</li>
-        <li><a href="esddns_service.html#module-esddns_service.esddns_endpoint">esddns_service.esddns_endpoint</a>
 </li>
       </ul></li>
   </ul></td>
@@ -250,34 +291,50 @@
   </ul></td>
 </tr></table>
 
-<h2 id="R">R</h2>
+<h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="esddns_service.html#esddns_service.esddns_endpoint.render_page">render_page() (in module esddns_service.esddns_endpoint)</a>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.parse_xor_mapped_address">parse_xor_mapped_address() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_tcp">query_stun_tcp() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#api.get_ip.WANIPState.retry_request">retry_request() (api.get_ip.WANIPState method)</a>
+      <li><a href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_udp">query_stun_udp() (api.async_stun_discovery.AsyncSTUNDiscovery method)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.get_ip.WANIPState.retry_request">retry_request() (api.get_ip.WANIPState method)</a>
+
+      <ul>
+        <li><a href="api.html#api.get_ip_stun.STUNProvider.retry_request">(api.get_ip_stun.STUNProvider method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="esddns_service.html#esddns_service.esddns_endpoint.start">start() (in module esddns_service.esddns_endpoint)</a>
+      <li><a href="api.html#api.async_stun_discovery.STUNConfig">STUNConfig (class in api.async_stun_discovery)</a>
+</li>
+      <li><a href="api.html#api.async_stun_discovery.STUNDatagramClient">STUNDatagramClient (class in api.async_stun_discovery)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#api.get_ip_stun.STUNProvider">STUNProvider (class in api.get_ip_stun)</a>
+</li>
       <li><a href="esddns.html#esddns.ESDDNS.sync_states">sync_states() (esddns.ESDDNS method)</a>, <a href="esddns.html#id1">[1]</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="esddns_service.html#esddns_service.esddns_endpoint.timestamp">timestamp() (in module esddns_service.esddns_endpoint)</a>
 </li>
   </ul></td>
 </tr></table>

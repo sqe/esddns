@@ -8,66 +8,118 @@ import configparser
 import ipaddress
 import json
 import requests
-import sys 
+import sys
+
+# Optional STUN support
+try:
+    from .get_ip_stun import STUNProvider
+    STUN_AVAILABLE = True
+except ImportError as e:
+    STUN_AVAILABLE = False
+    import logging
+    logging.getLogger(__name__).debug(f"STUN not available: {e}") 
 
 class WANIPState:
     """A Class to retrieve Public WAN IP from multiple external sources 
-    and return as a State
+    (STUN protocol and/or HTTP services) and return as a State
+
+    IP Discovery Methods (Configurable):
+    
+        STUN Protocol (Optional):
+            Enabled when [STUNConfig] section exists in dns.ini
+            Uses RFC 8489 compliant STUN protocol over UDP and TCP
+            Async/concurrent queries to multiple STUN servers
+            Retry logic with exponential backoff
+            Typically ~2x faster than HTTP services
+            
+        HTTP Services (Optional):
+            Enabled when [WANIPState] section exists in dns.ini
+            Multi-threaded concurrent HTTP requests to external IP check services
+            Retry logic for transient failures (HTTP status codes: 408, 429, 449, 500, 502, 503, 504, 509)
+            
+        Note: At least one method ([STUNConfig] or [WANIPState]) must be configured.
+              Both can be enabled for redundancy - STUN runs first, HTTP verifies.
 
     Methods:
 
     __init__(self):
-        Initiates Dynamic multi-threaded extraction of valid Public WAN IPs 
-        from services and creates a updates the list `self.ipaddress_list` 
-        upon IPv4 address discovery.
+        Initiates WANIPState class and performs IP discovery.
 
-        Defaults:
-
-            `self.config` : Object instance
-                ConfigParser instance
-            `self.config.read('dns.ini')`: file 
-                Configuration file
-            `self.ip_conf` : dict
-                dictionary of variables of WANIPState section from configuration file
-            `self.ip_check_services` : list 
-                list from dictionary of external ip check services from self.ip_conf
-            `self.retry_attempts`: int
-                number of retry attempts 
-            `self.retry_interval`: int
-                cooldown interval, multiplied to retry attempt on each iteration
-                list to store WAN IP addresses collected from supplied services
-            `self.ipaddress_list`: list
-                collected IPs, defaults to Empty
-            `self.ips_extraction()`: method
-               adds extracted IPs to discovered ipaddresses list ipaddress_list
-            `self._wan_ip_state`: dict 
-                defatult local mutable WAN IP State containing usable state of 
-                `{"wan_ip_state" : {"usable" : False, "IP": {}}}`
+        Configuration Loading:
+            `self.config` : ConfigParser instance
+            `self.config.read('dns.ini')` : Loads configuration file
+            
+        HTTP Services (if [WANIPState] exists):
+            `self.http_enabled` : bool - True if HTTP services configured
+            `self.ip_conf` : dict - WANIPState section variables
+            `self.ip_check_services` : list - External HTTP IP check service URLs
+            `self.retry_attempts` : int - Number of retry attempts (default: 3)
+            `self.retry_interval` : int - Cooldown interval in seconds (default: 5)
+            `self.s` : requests.Session - HTTP session for requests
+            
+        STUN Protocol (if [STUNConfig] exists and module available):
+            `self.stun_enabled` : bool - True if STUN protocol configured
+            `self.stun_provider` : STUNProvider - STUN query handler
+            Queries multiple STUN servers concurrently (UDP and TCP)
+            Retry logic with exponential backoff
+            
+        Common:
+            `self.ipaddress_list` : list - Collected valid IPs from all sources
+            `self._wan_ip_state` : dict - `{"wan_ip_state": {"usable": False, "IP": {}}}`
+            `self.ips_extraction()` : Executes IP discovery from configured sources
 
     __call__(self):
         Functor to return WAN IP State when WANIPState() class is called
+        Returns: self.wan_ip_state()
 
     retry_request(self, svc, func=None)
-        Decorator for request retry function func on external service, 
-        used if an external service is in flaky state but with retriable 
-        http status code.
+        HTTP retry decorator for request function on external service.
+        Used when HTTP service returns retriable status codes.
+        
+        Parameters:
+            svc (str): External service URL
+            func (function): Function to retry
     
-    get_wan_ip(sefl, svc=None)   
-        Retrieves Public WAN IP from external service.
-        Retries if HTTP STATUS CODE is in list:[408, 429, 449, 500, 502, 503, 504, 509]
-        Gracefully exits in Request Exceptions
+    get_wan_ip(self, svc=None)   
+        Retrieves Public WAN IP from external HTTP service.
+        Retries if HTTP STATUS CODE is in list: [408, 429, 449, 500, 502, 503, 504, 509]
+        Gracefully handles Request Exceptions
+        
+        Returns:
+            tuple: (IP, service) - IPv4 string and service URL, or (None, service) on failure
 
     ips_extraction(self)
-        Dynamic multi-threaded extraction of valid Public WAN IPs from services 
-        via get_wan_ip method.
-        Adds extracted IPs to discovered ipaddresses list ipaddress_list
-        Gracefully skips if IP is malformed, or if WAN IP is not Globally Reachable 
-        https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml
+        Executes IP discovery from configured sources with priority order.
+        
+        Priority Order:
+            1. STUN Protocol (if enabled) - Queries STUN servers with retry logic
+            2. HTTP Services (if enabled) - Multi-threaded HTTP queries with retry logic
+            
+        Validation:
+            - Validates IPv4 format using ipaddress.IPv4Address
+            - Checks global reachability (filters private/reserved IPs)
+            - See: https://www.iana.org/assignments/iana-ipv4-special-registry/
+            
+        Behavior:
+            - Failed queries returning None are filtered out
+            - Adds all valid IPs to self.ipaddress_list
+            - Skips gracefully on malformed or non-global IPs
 
     wan_ip_state(self)
-        WAN IP State dictionary, contains "usable" state (True or False) and,
-        Validated Globally Reachable WAN IP or empty value. Gracefully skips and exits 
-        if Unable to collect any IPs or if Collected IP addresses do not match    
+        Returns WAN IP State dictionary with validation of all collected IPs.
+        
+        Validation Logic:
+            - Compares all IPs in ipaddress_list (from STUN and/or HTTP)
+            - All IPs must match or only one IP collected
+            
+        Returns:
+            dict: `{"wan_ip_state": {"usable": True/False, "IP": "x.x.x.x" or {}}}`
+            
+        Cases:
+            Multiple IPs Match: usable=True (e.g., STUN + 2 HTTP all return same IP)
+            Single IP Collected: usable=True (e.g., only STUN succeeded)
+            IP Mismatch: usable=False, exits (e.g., STUN=1.2.3.4, HTTP=5.6.7.8)
+            No IPs Collected: usable=False, exits
     """
     def __init__(self):
         """Initiates WANIPState class
@@ -76,16 +128,57 @@ class WANIPState:
         # Initializing variables and class methods
         self.config = configparser.ConfigParser()
         self.config.read('dns.ini')
-        self.ip_conf = dict(self.config["WANIPState"])
-        self.ip_check_services = json.loads(self.ip_conf["ip_check_services"])["svc"]
-        self.retry_interval = int(self.ip_conf["retry_cooldown_seconds"])
-        self.retry_attempts = int(self.ip_conf["retry_attempts"])
+        
         # Initializing logging
         self.logger = logger_wrapper()
-        # Initialize HTTP Request session
+        
+        # Check if WANIPState section exists (HTTP services)
+        self.http_enabled = False
+        if "WANIPState" in self.config:
+            self.ip_conf = dict(self.config["WANIPState"])
+            self.ip_check_services = json.loads(self.ip_conf["ip_check_services"])["svc"]
+            self.retry_interval = int(self.ip_conf["retry_cooldown_seconds"])
+            self.retry_attempts = int(self.ip_conf["retry_attempts"])
+            self.http_enabled = True
+            self.logger.info("HTTP-based IP services enabled")
+        else:
+            # Set defaults for when HTTP is disabled
+            self.ip_conf = {
+                "msg_ip_invalid": "SKIPPING: Invalid IPv4 address: {}",
+                "msg_ip_non_global": "SKIPPING: IPv4 is not Globally Reachable {}",
+                "msg_missmatch": "CRITICAL: {} Mismatch in IPv4 addresses {}",
+                "msg_success_from_all": "SUCCESS: IPv4 addresses match! {}",
+                "msg_success_from_one": "SUCCESS: IP collected! {}",
+                "msg_ip_not_collected": "CRITICAL: Unable to collect IPv4 address"
+            }
+            self.ip_check_services = []
+            self.retry_interval = 5
+            self.retry_attempts = 3
+            self.logger.info("HTTP-based IP services disabled (no [WANIPState] section)")
+        
+        # Initialize HTTP Request session (even if HTTP disabled, for potential future use)
         self.s = requests.Session()
+        
         # WAN IP address list from supplied services
         self.ipaddress_list = []
+        
+        # Check if STUN is configured and available
+        self.stun_enabled = False
+        self.stun_provider = None
+        if STUN_AVAILABLE and "STUNConfig" in self.config:
+            try:
+                self.stun_provider = STUNProvider(name="stun", cfgfile="dns.ini")
+                self.stun_enabled = True
+                self.logger.info("STUN protocol enabled for IP discovery")
+            except Exception as e:
+                self.logger.warning(f"STUN provider initialization failed: {e}, falling back to HTTP services")
+        
+        # Validate at least one method is enabled
+        if not self.stun_enabled and not self.http_enabled:
+            error_msg = "CRITICAL: Neither STUN nor HTTP IP discovery methods are configured!"
+            self.logger.critical(error_msg)
+            sys.exit(error_msg)
+        
         self.ips_extraction()
         self._wan_ip_state = {"wan_ip_state" : {"usable" : False, "IP": {}}}
 
@@ -198,24 +291,40 @@ class WANIPState:
             value : length of self.ip_check_services list
             maximum amount of concurrent worker threads to utilize.
         """
-        with ThreadPoolExecutor(max_workers=len(self.ip_check_services)) as executor:
-            jobs = [executor.submit(
-                self.get_wan_ip, svc) for svc in self.ip_check_services]
-            for job in as_completed(jobs):
-                if job.result()[0] is None:
-                    continue
-                job_result_ip, job_result_svc = job.result()
-                ip_address = ipaddress.IPv4Address(job_result_ip)
-                ip_format_check = str(ip_address)
-                if job_result_ip != ip_format_check:
-                    self.logger.critical(self.ip_conf["msg_ip_invalid"].format(
-                        job_result_ip))
-                    continue
-                if not ip_address.is_global:
-                    self.logger.critical(self.ip_conf["msg_ip_non_global"].format(
-                        ip_address))
-                    continue
-                self.ipaddress_list.append(job_result_ip)
+        # Try STUN first if enabled
+        if self.stun_enabled and self.stun_provider:
+            try:
+                stun_ip, stun_service = self.stun_provider.get_wan_ip()
+                if stun_ip:
+                    ip_address = ipaddress.IPv4Address(stun_ip)
+                    if ip_address.is_global:
+                        self.logger.info(f"SUCCESS: STUN returned {stun_ip} from {stun_service}")
+                        self.ipaddress_list.append(stun_ip)
+                    else:
+                        self.logger.warning(f"STUN IP {stun_ip} is not globally reachable, trying HTTP services")
+            except Exception as e:
+                self.logger.warning(f"STUN query failed: {e}, falling back to HTTP services")
+        
+        # Proceed with HTTP services (as fallback or additional verification)
+        if self.http_enabled and self.ip_check_services:
+            with ThreadPoolExecutor(max_workers=len(self.ip_check_services)) as executor:
+                jobs = [executor.submit(
+                    self.get_wan_ip, svc) for svc in self.ip_check_services]
+                for job in as_completed(jobs):
+                    if job.result()[0] is None:
+                        continue
+                    job_result_ip, job_result_svc = job.result()
+                    ip_address = ipaddress.IPv4Address(job_result_ip)
+                    ip_format_check = str(ip_address)
+                    if job_result_ip != ip_format_check:
+                        self.logger.critical(self.ip_conf["msg_ip_invalid"].format(
+                            job_result_ip))
+                        continue
+                    if not ip_address.is_global:
+                        self.logger.critical(self.ip_conf["msg_ip_non_global"].format(
+                            ip_address))
+                        continue
+                    self.ipaddress_list.append(job_result_ip)
 
     def wan_ip_state(self):
         """Returns WAN IP State dictionary, contains  usable state (True or False) and,
