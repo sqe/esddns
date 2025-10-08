@@ -168,9 +168,6 @@ Failed queries returning `None` are filtered out and don't affect validation.
 - View retry logs: `WARNING [stun] RETRY: Attempt #2...`
 - System falls back to HTTP automatically
 
-Here is the Markdown text to add near the top or in your "STUN Protocol Integration" section, as requested. This covers the origins, milestone nature, and attribution of the feature request, following your specifications.
-
-***
 
 
 <span style="display:none">[^1]</span>
