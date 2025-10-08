@@ -1,8 +1,8 @@
-name: Deploy Sphinx Documentation to GitHub Pages
+name: Deploy Sphinx Documentation to GitHub Pages.
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature-add-stun-support"]
   workflow_dispatch:
 
 permissions:

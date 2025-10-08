@@ -1,5 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
 # [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
 
 [![ESDDNS AutoTest Framework](https://github.com/sqe/esddns/actions/workflows/autotests.yaml/badge.svg)](https://github.com/sqe/esddns/actions/workflows/autotests.yaml)
