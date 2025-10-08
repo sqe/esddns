@@ -313,13 +313,12 @@ class AsyncSTUNDiscovery:
                     lines = (await resp.text()).splitlines()
                     for line in lines:
                         line = line.strip()
-                        if not line or ':' not in line: continue
+                        if not line or ':' not in line: 
+                            continue
                         host, port_str = line.split(':', 1)
                         try:
                             hosts.append(
-                                (host, 
-                                 int(port_str)
-                                 ))
+                                (host, int(port_str)))
                         except Exception:
                             self.logger.warning(f"Skipping malformed line: {line}")
             self.logger.info(f"Loaded {len(hosts)} hosts from {url}")
