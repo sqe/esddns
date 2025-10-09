@@ -10,7 +10,6 @@ import json
 import requests
 import sys
 
-# Optional STUN support
 try:
     from .get_ip_stun import STUNProvider
     STUN_AVAILABLE = True
