@@ -26,7 +26,7 @@ managed DNS A record via REST APIs.
 
 The integration of STUN protocol in ESDDNS was made possible by a community feature request, marking a major milestone: it is the **first time STUN-based public IP detection** is available in this project.
 
-STUN support was requested in [issue \#71](https://github.com/sqe/esddns/issues/71) by [willglynn](https://github.com/willglynn), opened [yesterday](https://github.com/sqe/esddns/issues/71#issue-3493239265). This enhancement fulfills the need for a robust, modern method for NAT traversal and public IPv4 discovery—an essential capability for reliable dynamic DNS updates.
+STUN support was requested in [issue \#71](https://github.com/sqe/esddns/issues/71) by [willglynn](https://github.com/willglynn). This enhancement fulfills the need for a robust, modern method for NAT traversal and public IPv4 discovery—an essential capability for reliable dynamic DNS updates.
 
 [Session Traversal Utilities for NAT (STUN)](https://datatracker.ietf.org/doc/html/rfc8489) is a standardized protocol for discovering the public IP address and port assigned to a device through NAT. Historically used in VoIP (e.g., SIP), STUN is now common in WebRTC, so many large tech providers operate public STUN infrastructure.
 
@@ -37,7 +37,7 @@ Recommended public STUN servers:
 - `global.stun.twilio.com:3478` (Twilio)
 - See this [public STUN server list](https://github.com/pradt2/always-online-stun/tree/master) for additional choices.
 
-This milestone reflects ESDDNS's commitment to open development, modern standards, and responsiveness to user feedback. Special thanks to [willglynn](https://github.com/willglynn) and all contributors for driving this important feature forward.
+This milestone reflects ESDDNS's commitment to open development, modern standards, and responsiveness to user feedback. Special thanks to [willglynn](https://github.com/willglynn) for this important feature request.
 
 ## STUN Protocol Integration
 
@@ -129,7 +129,7 @@ ipaddress_list = ["174.247.177.50", "174.247.177.50", "174.247.177.50"]
 → Log: "SUCCESS: IPv4 addresses from external services match!"
 ```
 
-**Scenario 2: Single Source** (STUN only)
+**Scenario 2: Single Source, all others fail** (STUN only)
 
 ```python
 ipaddress_list = ["174.247.177.50"]

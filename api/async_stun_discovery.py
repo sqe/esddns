@@ -94,17 +94,17 @@ class AsyncSTUNDiscovery:
             bytes: 20-byte binary header to be sent as Binding Request, ready for UDP/TCP transmission.
 
         RFC 8489 Section 6 describes the fixed header format:
-        0                   1                   2                   3
-        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |0 0|     STUN Message Type     |         Message Length        |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                         Magic Cookie                          |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |                                                               |
-        |                     Transaction ID (96 bits)                 |
-        |                                                               |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         0                   1                   2                   3
+         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |0 0|     STUN Message Type     |         Message Length        |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                         Magic Cookie                          |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                                                               |
+         |                     Transaction ID (96 bits)                  |
+         |                                                               |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         - Message Type = 0x0001 for Binding Request
         - Message Length = 0x0000 (no attributes included in this minimal request)
@@ -143,21 +143,6 @@ class AsyncSTUNDiscovery:
         - 'H': attribute type (2 bytes)
         - 'H': attribute length (2 bytes)
         """
-        # offset = 20
-        # while offset + 4 <= len(data):
-        #     attr_type, attr_len = struct.unpack('!HH', data[offset:offset+4])
-        #     attr = data[offset+4:offset+4+attr_len]
-        #     if attr_type == self.stun_conf.XOR_MAPPED_ADDRESS and attr_len >= 8:
-        #         family = attr[1]
-        #         if family == 0x01:  # IPv4
-        #             x_port = struct.unpack('!H', attr[2:4])[0] ^ (self.stun_conf.MAGIC_COOKIE >> 16)
-        #             x_ip = struct.unpack('!I', attr[4:8])[0] ^ self.stun_conf.MAGIC_COOKIE
-        #             ip_address = socket.inet_ntoa(struct.pack('!I', x_ip))
-        #             return ip_address, x_port
-        #     offset += 4 + attr_len
-        # return None, None 
-        
-        # Start after 20-byte STUN header
         offset = 20  # skip the STUN header
         while offset + 4 <= len(data):
             try:
@@ -208,58 +193,6 @@ class AsyncSTUNDiscovery:
         
         finally:
             transport.close()        
-        # try:
-        #     # Await result for up to 2s
-        #     response = await protocol.get_response(timeout=2)
-        #     ip, external_port = parse_xor_mapped_address(response) if response else (None, None)
-        #     if ip and external_port:
-        #         logging.info(f"[UDP] {host}:{port} → Public IP: {ip}, Port: {external_port}")
-        #         return ip, external_port
-        #     else:
-        #         logging.warning(f"[UDP] {host}:{port} → XOR-MAPPED-ADDRESS attribute not found in response.")
-        #         return None, None
-        # except asyncio.TimeoutError:
-        #     logging.error(f"[UDP] {host}:{port} → Request timed out.")
-        #     return None, None
-        # except Exception as exc:
-        #     logging.error(f"[UDP] {host}:{port} → Exception: {exc}")
-        #     return None, None
-        # finally:
-        #     transport.close()
-
-    # async def query_stun_tcp(host: str, port: int) -> Tuple[Optional[str], Optional[int]]:
-    #     """
-    #     Asynchronously send a STUN Binding Request over TCP and parse the response.
-
-    #     Args:
-    #         host (str): Target STUN server host.
-    #         port (int): Target TCP port.
-
-    #     Returns:
-    #         tuple: (public_ip (str), public_port (int)), or (None, None).
-
-    #     Documentation:
-    #         Uses asyncio streams (open_connection) for TCP I/O.
-    #         Request/response is sent and received in binary form.
-    #     """
-    #     req_msg = build_stun_binding_request()
-    #     try:
-    #         reader, writer = await asyncio.open_connection(host, port)
-    #         writer.write(req_msg)
-    #         await writer.drain()
-    #         response = await asyncio.wait_for(reader.read(2048), timeout=3)
-    #         writer.close()
-    #         await writer.wait_closed()
-    #         ip, external_port = parse_xor_mapped_address(response) if response else (None, None)
-    #         if ip and external_port:
-    #             logging.info(f"[TCP] {host}:{port} → Public IP: {ip}, Port: {external_port}")
-    #             return ip, external_port
-    #         else:
-    #             logging.warning(f"[TCP] {host}:{port} → XOR-MAPPED-ADDRESS not found in response.")
-    #             return None, None
-    #     except (asyncio.TimeoutError, Exception) as exc:
-    #         logging.error(f"[TCP] {host}:{port} → Exception: {exc}")
-    #         return None, None
     async def query_stun_tcp(self, host, port):
         """
         Asynchronously send a STUN Binding Request over TCP and parse the response.
