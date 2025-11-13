@@ -1,0 +1,47 @@
+apiVersion: v1
+entries:
+  esddns-operator:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial Helm chart release for ESDDNS operator
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/links: |
+        - name: Support
+          url: https://github.com/sqe/esddns/issues
+        - name: Documentation
+          url: https://github.com/sqe/esddns#readme
+      artifacthub.io/operator: "true"
+      artifacthub.io/operatorCapabilities: Seamless Upgrades
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/recommendations: |
+        - prometheus
+        - kube-state-metrics
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-11-13T01:37:06.03979-08:00"
+    description: A Kubernetes operator for dynamic DNS updates using ESDDNS with Gandi.net
+      API
+    digest: ddbf6a277fe5a46c7fdd0512151b7bb84e2683cc06f2ff3107999898bc64abb5
+    home: https://github.com/sqe/esddns
+    icon: https://raw.githubusercontent.com/sqe/esddns/main/docs/icon.svg
+    keywords:
+    - dns
+    - dynamic-dns
+    - ddns
+    - kubernetes
+    - operator
+    - gandi
+    - esddns
+    maintainers:
+    - email: support@example.com
+      name: ESDDNS Team
+      url: https://github.com/sqe/esddns
+    name: esddns-operator
+    sources:
+    - https://github.com/sqe/esddns
+    type: application
+    urls:
+    - https://sqe.github.io/esddns/helm-repo/esddns-operator-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-11-13T01:37:06.038887-08:00"
