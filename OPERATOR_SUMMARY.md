@@ -213,52 +213,52 @@ Features:
 │       Kubernetes Cluster (Any Cloud)                     │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
-│  CENTRALIZED IP DETECTION (Leader via Kopf lock)        │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │ Kopf Operator (Single Instance)                  │   │
-│  │ CentralizedIPDetector.detect_wan_ip()            │   │
-│  │ • Detects IP every 5 minutes                     │   │
-│  │ • Stores in ConfigMap: esddns-wan-ip             │   │
-│  └────────────────┬─────────────────────────────────┘   │
+│  CENTRALIZED IP DETECTION (Leader via Kopf lock)         │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │ Kopf Operator (Single Instance)                  │    │
+│  │ CentralizedIPDetector.detect_wan_ip()            │    │
+│  │ • Detects IP every 5 minutes                     │    │
+│  │ • Stores in ConfigMap: esddns-wan-ip             │    │
+│  └────────────────┬─────────────────────────────────┘    │
 │                   │                                      │
 │                   ▼                                      │
-│       ┌─────────────────────────┐                       │
-│       │ ConfigMap               │                       │
-│       │ esddns-wan-ip           │                       │
-│       │ current_ip: X.X.X.X     │                       │
-│       │ detected_at: timestamp  │                       │
-│       └────────┬────────────────┘                       │
-│                │                                        │
-│  DISTRIBUTED DNS UPDATES (All DaemonSet pods)          │
-│  Node 1              Node 2        Node N              │
-│  ┌──────────────────┐ ┌──────────────────┐            │
-│  │ Operator Pod     │ │ Operator Pod     │ ...        │
-│  │ (hostNetwork)    │ │ (hostNetwork)    │            │
-│  │ NodeDNSUpdater   │ │ NodeDNSUpdater   │            │
-│  │ • Read ConfigMap │ │ • Read ConfigMap │            │
-│  │ • Update DNS     │ │ • Update DNS     │            │
-│  │ • Fallback if    │ │ • Fallback if    │            │
-│  │   stale/missing  │ │   stale/missing  │            │
-│  └────┬─────────────┘ └────┬─────────────┘            │
-│       │                    │                           │
-│       └────────────────────┴──────────────┐            │
-│                                           │            │
-│  ┌──────────────────────────────────┐    │            │
-│  │  esddns-service (Deployment)     │    │            │
-│  │  Flask web service (1 replica)   │    │            │
-│  │  :51339 HTTP endpoint            │    │            │
-│  └──────────────────────────────────┘    │            │
-│             │                            │            │
-│  ┌──────────▼────────────────────┐      │            │
-│  │  LoadBalancer Service          │      │            │
-│  │  External IP (cloud provider)  │      │            │
-│  │  Ports: 80, 443 → 51339        │      │            │
-│  └──────────┬────────────────────┘      │            │
-│             │                           │            │
-└─────────────┼───────────────────────────┘            │
-              │                                        │
-        ┌─────▼────────────────────────┐              │
-        │  Gandi.net LiveDNS API       │◄─────────────┘
+│       ┌─────────────────────────┐                        │
+│       │ ConfigMap               │                        │
+│       │ esddns-wan-ip           │                        │
+│       │ current_ip: X.X.X.X     │                        │
+│       │ detected_at: timestamp  │                        │
+│       └────────┬────────────────┘                        │
+│                │                                         │
+│  DISTRIBUTED DNS UPDATES (All DaemonSet pods)            │
+│  Node 1              Node 2        Node N                │
+│  ┌──────────────────┐ ┌──────────────────┐               │
+│  │ Operator Pod     │ │ Operator Pod     │ ...           │
+│  │ (hostNetwork)    │ │ (hostNetwork)    │               │
+│  │ NodeDNSUpdater   │ │ NodeDNSUpdater   │               │
+│  │ • Read ConfigMap │ │ • Read ConfigMap │               │
+│  │ • Update DNS     │ │ • Update DNS     │               │
+│  │ • Fallback if    │ │ • Fallback if    │               │
+│  │   stale/missing  │ │   stale/missing  │               │
+│  └────┬─────────────┘ └────┬─────────────┘               │
+│       │                    │                             │
+│       └────────────────────┴──────────────┐              │
+│                                           │              │
+│  ┌──────────────────────────────────┐     │              │
+│  │  esddns-service (Deployment)     │     │              │
+│  │  Flask web service (1 replica)   │     │              │
+│  │  :51339 HTTP endpoint            │     │              │
+│  └──────────────────────────────────┘     │              │
+│             │                             │              │
+│  ┌──────────▼────────────────────┐        │              │
+│  │  LoadBalancer Service         │        │              │
+│  │  External IP (cloud provider) │        │              │
+│  │  Ports: 80, 443 → 51339       │        │              │
+│  └──────────┬────────────────────┘        │              │
+│             │                             │              │
+└─────────────┼─────────────────────────────┘              │
+              │                                            │
+        ┌─────▼────────────────────────┐                   │
+        │  Gandi.net LiveDNS API       │◄──────────────────┘
         │  A Record Updates            │
         │  https://api.gandi.net/v5    │
         └──────────────────────────────┘
@@ -343,19 +343,33 @@ kubectl patch svc esddns-service -n esddns \
 ## Key Features
 
 ✅ **Centralized IP Detection** - Single leader detects WAN IP once (90-95% fewer API calls)
+
 ✅ **Distributed DNS Updates** - All nodes update DNS from ConfigMap cache
+
 ✅ **High Availability** - Fallback to direct detection if ConfigMap unavailable/stale
+
 ✅ **Network Isolation Safe** - Works even if nodes can't reach external services
+
 ✅ **Zero Configuration Drift** - All nodes use same detected IP source
+
 ✅ **Cloud Integration** - LoadBalancer with stable external IP
+
 ✅ **Prometheus Metrics** - Full observability with fallback tracking
+
 ✅ **Alert Rules** - PrometheusRules for critical events
+
 ✅ **Environment Isolation** - Dev/prod kustomization overlays
+
 ✅ **Configuration Management** - ConfigMap + Secrets + IP cache
+
 ✅ **Health Checks** - Liveness and readiness probes
+
 ✅ **RBAC** - Minimal required permissions (with ConfigMap access)
+
 ✅ **Automated Deployment** - deploy.sh script
+
 ✅ **Complete Documentation** - DEPLOYMENT.md + README.md
+
 ✅ **Security** - Non-root for web service, secrets management
 
 ## Getting Started
