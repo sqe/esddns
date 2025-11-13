@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api.dns_manager &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">esddns</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.dns_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for api.dns_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">configparser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logs</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">requests.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">HTTPError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">requests.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestException</span> <span class="k">as</span> <span class="n">RequestException</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<div class="viewcode-block" id="DomainManagement"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">DomainManagement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Class to manage DNS Domain and Records and it&#39;s state</span>
+
+<span class="sd">    Methods</span>
+
+<span class="sd">    __init__(self)</span>
+<span class="sd">        Initialize variables and helpers to manage DNS domains and records</span>
+
+<span class="sd">        Defaults</span>
+<span class="sd">            `self.config` : Object instance</span>
+<span class="sd">                ConfigParser instance</span>
+<span class="sd">            `self.config.read(&#39;dns.ini&#39;)` : file </span>
+<span class="sd">                Configuration file</span>
+<span class="sd">            `self.dns_config` : dict</span>
+<span class="sd">                dictionary of variables of gandi section from configuration file</span>
+<span class="sd">            `self.header_auth` : dict</span>
+<span class="sd">                dictionary for authorization header, read key from config file</span>
+<span class="sd">                {&quot;Authorization&quot;: &quot;Apikey &quot; + self.dns_config[&quot;api_key&quot;]}</span>
+<span class="sd">            `self.header_content_type` : dict</span>
+<span class="sd">                dictonary for content-type header</span>
+<span class="sd">                {&quot;content-type&quot;: &quot;application/json&quot;}</span>
+<span class="sd">            `self.logger` : Method instance</span>
+<span class="sd">                logger_wrapper() log wrapper instance</span>
+<span class="sd">            `self.s` : Session instance</span>
+<span class="sd">                requests.Session() instance</span>
+<span class="sd">            `self.dns_record_state` : dict</span>
+<span class="sd">                default dns record state </span>
+<span class="sd">                {&quot;record_state&quot;: {&quot;in_sync&quot;: False, &quot;record_data&quot;: {}}}</span>
+<span class="sd">    </span>
+<span class="sd">    exception_handler(func)</span>
+<span class="sd">        Exception handler decorator for HTTP requests, receives a function to run.</span>
+<span class="sd">        Try/except wrapper function decorator handle and log exceptions.</span>
+
+<span class="sd">    get_all_domains()</span>
+<span class="sd">        Retrieves and returns all domains for your Account/Organization</span>
+
+<span class="sd">    get_target_domain_url()</span>
+<span class="sd">        Retrieves and returns target domain url from `get_all_domains()`,</span>
+<span class="sd">        target_domain_fqdn supplied from config file</span>
+<span class="sd">    </span>
+<span class="sd">    get_target_domain_records()</span>
+<span class="sd">        Retrieves and returns target domain&#39;s all records from `get_target_domain_url()`</span>
+
+<span class="sd">    get_target_domain_a_records()</span>
+<span class="sd">        Seek for target `record_type_a` and `record_name_root` supplied from </span>
+<span class="sd">        config file, environment variable `RECORD_NAME_ROOT` should be exported,</span>
+<span class="sd">        return if such A record found else log </span>
+<span class="sd">        &quot;Searching for the target A record&quot; event and keep looking through </span>
+<span class="sd">        all records </span>
+<span class="sd">    </span>
+<span class="sd">    manage_a_record(ip=None)</span>
+<span class="sd">        Manages target DNS A record, if target A record not found from </span>
+<span class="sd">        `get_target_domain_a_records()` creates the target A record </span>
+<span class="sd">        from supplied argument`ip` and returns new A record data </span>
+
+<span class="sd">    a_record_state(ip=None)</span>
+<span class="sd">        Manages DNS A record state. Using `manage_a_record(ip)` </span>
+<span class="sd">        Checks if target A record&#39;s IP is equal to the supplied argument `ip`,</span>
+<span class="sd">        Returns updated dns_record_state setting `in_sync` to True </span>
+<span class="sd">        with filling record data</span>
+<span class="sd">        If not A record&#39;s IP is not same as supplied argument `ip` returns </span>
+<span class="sd">        defaults `dns_record_state`</span>
+
+<span class="sd">    create_record(rrset_name=None, rrset_type=None, ip=None, rrset_ttl=None)</span>
+<span class="sd">        Creates record with supplied args</span>
+<span class="sd">        Run with `@exception_handler` decorator</span>
+
+<span class="sd">    create_a_record(ip=None)</span>
+<span class="sd">        Creates A record via `create_record()` with supplying arguments </span>
+<span class="sd">        from configuration file and an IP address  </span>
+<span class="sd">    </span>
+<span class="sd">    overwrite_record(rrset_name=None, rrset_type=None, rrset_value=None, rrset_ttl=None)</span>
+<span class="sd">        Since Gandi.net doesn&#39;t offer `update a record` route they have `overwrite`</span>
+<span class="sd">        functionality to update a single recordset with supplied arguments</span>
+
+<span class="sd">    update_a_record(ip=None)</span>
+<span class="sd">        Updates single A record data with supplied IP address and argument from </span>
+<span class="sd">        config file  </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes DomainManagement class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;dns.ini&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;gandi&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_auth</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Apikey &quot;</span> <span class="o">+</span> 
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_key&quot;</span><span class="p">]]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header_content_type</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;record_state&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;in_sync&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;record_data&quot;</span><span class="p">:</span> <span class="p">{}}}</span>
+
+    <span class="c1"># Requests exception handler decorator</span>
+<div class="viewcode-block" id="DomainManagement.exception_handler"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.exception_handler">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">exception_handler</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Requests exception handling decorator</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">        func : function </span>
+<span class="sd">            Function with requests to decorate</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Function passed throug exception handling</span>
+<span class="sd">        If HTTP Exception caught:</span>
+<span class="sd">            log and exit with HTTP exception</span>
+<span class="sd">        If Base request exception caught:</span>
+<span class="sd">            log and exit with base exception</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">http_error</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">http_error</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">http_error</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">RequestException</span> <span class="k">as</span> <span class="n">base_exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">base_exception</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">base_exception</span><span class="p">)</span>     
+        <span class="k">return</span> <span class="n">wrapper</span></div>
+         
+<div class="viewcode-block" id="DomainManagement.get_all_domains"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.get_all_domains">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves and returns (does not display to user on purpose) </span>
+<span class="sd">        all domains for in Account/Organization. Constructs a request and </span>
+<span class="sd">        executes against https://api.gandi.net/docs/livedns/#get-v5-livedns-domains-fqdn</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            `url` : str </span>
+<span class="sd">                from config file `api_url_base` + `api_url_domains`  </span>
+<span class="sd">            `self.header_auth` : dict</span>
+<span class="sd">                dictionary for authorization header, read key from config file</span>
+<span class="sd">            `HTTP Request` : type</span>
+<span class="sd">                GET</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            dict: All domains in your Account / Organization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_auth</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_base&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_domains&quot;</span><span class="p">]</span>
+            <span class="n">domains_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">domains_request</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">domains_response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">domains_request</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_get_all_domains&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">domains_response</span></div>
+
+<div class="viewcode-block" id="DomainManagement.get_target_domain_url"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.get_target_domain_url">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_domain_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves and returns target domain url from `get_all_domains()`,</span>
+<span class="sd">        target_domain_fqdn supplied from config file</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            str: URL of target domain </span>
+<span class="sd">                - When target domain fqdn same as the one from config file</span>
+
+<span class="sd">            exit: Quit ESDDNS with error message</span>
+<span class="sd">                - When target domain fqdn is not same as the one from config file \</span>
+<span class="sd">                Iterate over next domain, if not found from any consequential loops \</span>
+<span class="sd">                log and exit `msg_dns_domain_not_found` from config file </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_domains</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_domains</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_search_domain&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">all_domains</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">domain</span><span class="p">[</span><span class="s2">&quot;fqdn&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;target_domain_fqdn&quot;</span><span class="p">]]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_found&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="s2">&quot;fqdn&quot;</span><span class="p">]))</span>
+                <span class="k">return</span> <span class="n">domain</span><span class="p">[</span><span class="s2">&quot;domain_records_href&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_not_found&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_not_found&quot;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="DomainManagement.get_target_domain_records"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.get_target_domain_records">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_domain_records</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves and returns target domain&#39;s all records from \</span>
+<span class="sd">            `get_target_domain_url()`</span>
+<span class="sd">        Run with `@exception_handler` decorator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: All records of the target domain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_auth</span>
+            <span class="n">target_domain_records_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_domain_url</span><span class="p">()</span>
+            <span class="n">records_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target_domain_records_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">records_response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">records_request</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_records_get&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">records_response</span></div>
+        
+<div class="viewcode-block" id="DomainManagement.get_target_domain_a_records"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.get_target_domain_a_records">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_domain_a_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fqdn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek for target `record_type_a` and `record_name_root` supplied from </span>
+<span class="sd">        config file, return if such A record found else log </span>
+<span class="sd">        &quot;Searching for the target A record&quot; event and keep looking through </span>
+<span class="sd">        all records </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict : A record data</span>
+<span class="sd">            - When A record&#39;s type and name match with supplied values from config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+            <span class="n">all_records</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_domain_records</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">a_record</span> <span class="ow">in</span> <span class="n">all_records</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">a_record</span><span class="p">[</span><span class="s2">&quot;rrset_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_type_a&quot;</span><span class="p">]]</span> \
+                    <span class="ow">and</span> \
+                    <span class="n">a_record</span><span class="p">[</span><span class="s2">&quot;rrset_name&quot;</span><span class="p">]</span> <span class="o">==</span> \
+                        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_name_root&quot;</span><span class="p">]]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_a_record_root_found&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a_record</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="n">a_record</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_a_records_get&quot;</span><span class="p">])</span>
+                    <span class="k">continue</span>                    
+            <span class="k">return</span></div>
+
+<div class="viewcode-block" id="DomainManagement.manage_a_record"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.manage_a_record">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">manage_a_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Manages target DNS A record, if target A record not found from </span>
+<span class="sd">        `get_target_domain_a_records()` creates the target A record </span>
+<span class="sd">        from supplied argument `ip` and returns new A record data </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ip (str, optional): IP address to use to bind to A record. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: target A record data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a_records_root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_domain_a_records</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a_records_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_a_record_not_found&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_a_record_root_create&quot;</span><span class="p">])</span>
+            <span class="n">create_a_record</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_a_record</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a_records_root</span></div>
+
+<div class="viewcode-block" id="DomainManagement.a_record_state"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.a_record_state">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">a_record_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Manages DNS A record state. Using `manage_a_record(ip)` </span>
+<span class="sd">        Checks if target A record&#39;s IP is equal to the supplied argument `ip`,</span>
+<span class="sd">        Returns updated dns_record_state setting `in_sync` to True </span>
+<span class="sd">        with filling record data</span>
+<span class="sd">        If not A record&#39;s IP is not same as supplied argument `ip` returns </span>
+<span class="sd">        defaults `dns_record_state`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ``{&quot;record_state&quot;: {&quot;in_sync&quot;: False/True, &quot;record_data&quot;: { data/empty }}}``</span>
+<span class="sd">            </span>
+<span class="sd">            dict: A record state  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">managed_a_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manage_a_record</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+        <span class="n">a_record_ip</span> <span class="o">=</span> <span class="n">managed_a_record</span><span class="p">[</span><span class="s2">&quot;rrset_values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_a_record_validate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">a_record_ip</span><span class="p">,</span> <span class="n">ip</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ip</span> <span class="o">==</span> <span class="n">a_record_ip</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A Record state has correct IP!&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;in_sync&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;record_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">managed_a_record</span> 
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span><span class="p">[</span><span class="s2">&quot;record_state&quot;</span><span class="p">][</span><span class="s2">&quot;record_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">managed_a_record</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_a_record_state_ip_not_synced&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_record_state</span></div>
+        
+<div class="viewcode-block" id="DomainManagement.create_record"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.create_record">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">fqdn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">rrset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">rrset_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">rrset_ttl</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates record with supplied args by constructing a request against </span>
+<span class="sd">        https://api.gandi.net/docs/livedns/#post-v5-livedns-domains-fqdn-records</span>
+<span class="sd">        Run with `@exception_handler` decorator</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rrset_name (str, optional): Record name.</span>
+<span class="sd">            rrset_type (str, optional): Record type.</span>
+<span class="sd">            ip (str, optional): IP address.</span>
+<span class="sd">            rrset_ttl (int, optional): TTL.</span>
+<span class="sd">            headers (dict): Union of headers.</span>
+<span class="sd">            POST Request (POST, default): HTTP Request type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: create_request_response, create_request.status_code, payload.</span>
+<span class="sd">                create_record request data</span>
+<span class="sd">            exit: Quit ESDDNS with error message</span>
+<span class="sd">                When create failed for some reason, log and exit response.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_auth</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_content_type</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_base&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_domains&quot;</span><span class="p">]</span>  <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_domains_records&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;target_domain_fqdn&quot;</span><span class="p">]])</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s2">&quot;rrset_name&quot;</span><span class="p">:</span> <span class="n">rrset_name</span><span class="p">,</span> 
+                <span class="s2">&quot;rrset_type&quot;</span><span class="p">:</span> <span class="n">rrset_type</span><span class="p">,</span>
+                <span class="s2">&quot;rrset_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ip</span><span class="p">],</span>
+                <span class="s2">&quot;rrset_ttl&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">rrset_ttl</span><span class="p">)})</span>
+            <span class="n">create_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">create_request_response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">create_request</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+            <span class="n">request_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_domain_record_create&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">create_request_response</span><span class="p">,</span> 
+                    <span class="n">create_request</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> 
+                    <span class="n">payload</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">create_request</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request_output</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">create_request_response</span><span class="p">,</span> <span class="n">create_request</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">payload</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">request_output</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">request_output</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DomainManagement.create_a_record"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.create_a_record">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_a_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates A Record using create_record() function, supply </span>
+<span class="sd">        record type &quot;A&quot; as rrset_type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ip (str, optional): IP address to use to bind to A record. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: create_request_response, create_request.status_code, payload.</span>
+<span class="sd">                create_record request data</span>
+<span class="sd">            exit: Quit ESDDNS with error message</span>
+<span class="sd">                When create failed for some reason, log and exit response.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">create_a_record</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="n">payload</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_record</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;target_domain_fqdn&quot;</span><span class="p">]],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_name_root&quot;</span><span class="p">]],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_type_a&quot;</span><span class="p">]],</span>
+            <span class="n">ip</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_ttl&quot;</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">create_a_record</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="n">payload</span></div>
+    
+<div class="viewcode-block" id="DomainManagement.overwrite_record"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.overwrite_record">[docs]</a>    <span class="nd">@exception_handler</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">overwrite_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+            <span class="n">fqdn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">rrset_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  
+            <span class="n">rrset_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">rrset_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  
+            <span class="n">rrset_ttl</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overwrites record with supplied args by constructing a request against</span>
+<span class="sd">        https://api.gandi.net/docs/livedns/#put-v5-livedns-domains-fqdn-records-rrset_name-rrset_type</span>
+<span class="sd">        Run with `@exception_handler` decorator</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fqdn (str, optional): fqdn.</span>
+<span class="sd">            rrset_name (str, optional): Record name.</span>
+<span class="sd">            rrset_type (str, optional): Record type.</span>
+<span class="sd">            rrset_value (str, optional): IP address.</span>
+<span class="sd">            rrset_ttl (int, optional): TTL.</span>
+<span class="sd">            headers (dict): Union of headers.</span>
+<span class="sd">            PUT Request (PUT, default): HTTP Request type.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: `overwrite_record_request` response and it&#39;s `status_code`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_auth</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_content_type</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_base&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_domains&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;api_url_domains_records&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;target_domain_fqdn&quot;</span><span class="p">]])</span> <span class="o">+</span> \
+                <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">rrset_name</span> <span class="o">+</span> \
+                <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">rrset_type</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;rrset_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">rrset_value</span><span class="p">],</span> 
+                 <span class="s2">&quot;rrset_ttl&quot;</span><span class="p">:</span> <span class="n">rrset_ttl</span><span class="p">})</span>
+            <span class="n">overwrite_record_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">overwrite_record_request_response</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+                <span class="n">overwrite_record_request</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+            <span class="k">return</span> \
+                <span class="n">overwrite_record_request_response</span><span class="p">,</span> \
+                <span class="n">overwrite_record_request</span><span class="o">.</span><span class="n">status_code</span></div>
+
+<div class="viewcode-block" id="DomainManagement.update_a_record"><a class="viewcode-back" href="../../api.html#api.dns_manager.DomainManagement.update_a_record">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_a_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates A record with `overwrite_record()` function, supply </span>
+<span class="sd">        `target_domain_fqdn`, `record_name_root`, `record_type_a`, `record_ttl` </span>
+<span class="sd">        from config file, and IP address from another Class to manage A record</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ip (str, optional): IP address to use to bind to A record. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: `update_a_record` response, and `status_code`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;msg_dns_a_record_overwrite&quot;</span><span class="p">])</span>
+        <span class="n">update_a_record</span><span class="p">,</span> <span class="n">status_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_record</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;target_domain_fqdn&quot;</span><span class="p">]],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_name_root&quot;</span><span class="p">]],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_type_a&quot;</span><span class="p">]],</span>
+            <span class="n">ip</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dns_config</span><span class="p">[</span><span class="s2">&quot;record_ttl&quot;</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">update_a_record</span><span class="p">,</span> <span class="n">status_code</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

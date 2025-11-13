@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>esddns package &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="api package" href="api.html" />
+    <link rel="prev" title="esddns" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">esddns</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">esddns package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html">api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esddns_service.html">esddns_service package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-esddns">esddns module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#esddns.ESDDNS"><code class="docutils literal notranslate"><span class="pre">ESDDNS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-0">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ESDDNS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esddns_service.html">esddns_service package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">esddns</a></li>
+      <li class="breadcrumb-item active">esddns package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/esddns.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="esddns-package">
+<h1>esddns package<a class="headerlink" href="#esddns-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.dns_manager">api.dns_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement"><code class="docutils literal notranslate"><span class="pre">DomainManagement</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.a_record_state"><code class="docutils literal notranslate"><span class="pre">DomainManagement.a_record_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.create_a_record"><code class="docutils literal notranslate"><span class="pre">DomainManagement.create_a_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.create_record"><code class="docutils literal notranslate"><span class="pre">DomainManagement.create_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.exception_handler"><code class="docutils literal notranslate"><span class="pre">DomainManagement.exception_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.get_all_domains"><code class="docutils literal notranslate"><span class="pre">DomainManagement.get_all_domains()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.get_target_domain_a_records"><code class="docutils literal notranslate"><span class="pre">DomainManagement.get_target_domain_a_records()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.get_target_domain_records"><code class="docutils literal notranslate"><span class="pre">DomainManagement.get_target_domain_records()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.get_target_domain_url"><code class="docutils literal notranslate"><span class="pre">DomainManagement.get_target_domain_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.manage_a_record"><code class="docutils literal notranslate"><span class="pre">DomainManagement.manage_a_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.overwrite_record"><code class="docutils literal notranslate"><span class="pre">DomainManagement.overwrite_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.dns_manager.DomainManagement.update_a_record"><code class="docutils literal notranslate"><span class="pre">DomainManagement.update_a_record()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.get_ip">api.get_ip module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.get_ip.WANIPState"><code class="docutils literal notranslate"><span class="pre">WANIPState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip.WANIPState.get_wan_ip"><code class="docutils literal notranslate"><span class="pre">WANIPState.get_wan_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip.WANIPState.ips_extraction"><code class="docutils literal notranslate"><span class="pre">WANIPState.ips_extraction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip.WANIPState.retry_request"><code class="docutils literal notranslate"><span class="pre">WANIPState.retry_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip.WANIPState.wan_ip_state"><code class="docutils literal notranslate"><span class="pre">WANIPState.wan_ip_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.get_ip_stun">api.get_ip_stun module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.get_ip_stun.STUNProvider"><code class="docutils literal notranslate"><span class="pre">STUNProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip_stun.STUNProvider.get_wan_ip"><code class="docutils literal notranslate"><span class="pre">STUNProvider.get_wan_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.get_ip_stun.STUNProvider.retry_request"><code class="docutils literal notranslate"><span class="pre">STUNProvider.retry_request()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.get_ip_stun.get_stun_ip_results"><code class="docutils literal notranslate"><span class="pre">get_stun_ip_results()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.async_stun_discovery">api.async_stun_discovery module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.build_stun_binding_request"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.build_stun_binding_request()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.load_host_list"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.load_host_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.main"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.parse_xor_mapped_address"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.parse_xor_mapped_address()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_tcp"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.query_stun_tcp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_udp"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery.query_stun_udp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNConfig"><code class="docutils literal notranslate"><span class="pre">STUNConfig</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient.connection_lost"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient.connection_lost()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient.connection_made"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient.connection_made()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient.datagram_received"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient.datagram_received()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient.error_received"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient.error_received()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.async_stun_discovery.STUNDatagramClient.get_response"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient.get_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.logs">api.logs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.logs.logger"><code class="docutils literal notranslate"><span class="pre">logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="esddns_service.html">esddns_service package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="esddns_service.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esddns_service.html#esddns-service-esddns-endpoint-module">esddns_service.esddns_endpoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esddns_service.html#module-esddns_service">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-esddns">
+<span id="esddns-module"></span><h2>esddns module<a class="headerlink" href="#module-esddns" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="esddns.ESDDNS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">esddns.</span></span><span class="sig-name descname"><span class="pre">ESDDNS</span></span><a class="reference internal" href="_modules/esddns.html#ESDDNS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns.ESDDNS" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Class to Synchronize WAN IP and DNS Record states</p>
+<ul class="simple">
+<li><p>When ESDDNS is ran directly from shell by executing: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">esddns.py</span></code></p></li>
+</ul>
+<p>It runs in Standalone mode with Daemon Thread which’s interval is set in
+configurationfile</p>
+<ul class="simple">
+<li><p>When imported as module, runs the Functor to return synchronized</p></li>
+</ul>
+<p>dynamic union of managed WAN IP and DNS Record states
+Methods:</p>
+<dl>
+<dt>__init__(self):</dt><dd><p>Initiates configuration, DomainManagement class, WAN IP State class, logging</p>
+<dl class="simple">
+<dt>Defaults</dt><dd><dl class="simple">
+<dt><cite>self.config</cite><span class="classifier">Object instance</span></dt><dd><p>ConfigParser instance</p>
+</dd>
+<dt><cite>self.config.read(‘dns.ini’)</cite><span class="classifier">file</span></dt><dd><p>Configuration file</p>
+</dd>
+<dt><cite>self.cur_conf</cite><span class="classifier">dict</span></dt><dd><p>dictionary of variables of ESDDNS section from configuration file</p>
+</dd>
+<dt><cite>self.dns_manager</cite>: Class instance</dt><dd><p>Initializes DomainManagement class</p>
+</dd>
+<dt><cite>self.wan_ip_state</cite>: Functor</dt><dd><p>WAN IP State as dictionary</p>
+</dd>
+<dt><cite>self.logger</cite><span class="classifier">Method instance</span></dt><dd><p>logger_wrapper() log wrapper instance</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>__call__(self):</dt><dd><p>Functor to return dynamic union of managed WAN IP and DNS A Record States
+when ESDDNS() class is called</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="esddns.ESDDNS.sync_states">
+<span class="sig-name descname"><span class="pre">sync_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns.html#ESDDNS.sync_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#esddns.ESDDNS.sync_states" title="Permalink to this definition"></a></dt>
+<dd><p>Manages both WAN IP and DNS A Records States for synchronization.
+Updates DNS A Record’s IP address if it’s out of sync.
+Logs each transaction.
+Gracefully exits if synchronization fails.</p>
+<p>Returns:
+<code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">'WAN_IP'},</span>
+<span class="pre">'record_state':</span> <span class="pre">{'in_sync':</span> <span class="pre">True,</span> <span class="pre">'record_data':</span> <span class="pre">{data}}}</span></code></p>
+<blockquote>
+<div><ul>
+<li><dl>
+<dt>dict: states union</dt><dd><ul class="simple">
+<li><p>When DNS Record state is in sync,</p></li>
+</ul>
+<p>Union of WAN IP and DNS A Record states.
+- When DNS A Record state is not in sync
+Updates DNS A Record IP with current WAN IP</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>exit: Quit ESDDNs with message</dt><dd><p>If can’t update DNS A record</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-0">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-0" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">esddns.</span></span><span class="sig-name descname"><span class="pre">ESDDNS</span></span><a class="reference internal" href="_modules/esddns.html#ESDDNS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Class to Synchronize WAN IP and DNS Record states</p>
+<ul class="simple">
+<li><p>When ESDDNS is ran directly from shell by executing: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">esddns.py</span></code></p></li>
+</ul>
+<p>It runs in Standalone mode with Daemon Thread which’s interval is set in
+configurationfile</p>
+<ul class="simple">
+<li><p>When imported as module, runs the Functor to return synchronized</p></li>
+</ul>
+<p>dynamic union of managed WAN IP and DNS Record states
+Methods:</p>
+<dl>
+<dt>__init__(self):</dt><dd><p>Initiates configuration, DomainManagement class, WAN IP State class, logging</p>
+<dl class="simple">
+<dt>Defaults</dt><dd><dl class="simple">
+<dt><cite>self.config</cite><span class="classifier">Object instance</span></dt><dd><p>ConfigParser instance</p>
+</dd>
+<dt><cite>self.config.read(‘dns.ini’)</cite><span class="classifier">file</span></dt><dd><p>Configuration file</p>
+</dd>
+<dt><cite>self.cur_conf</cite><span class="classifier">dict</span></dt><dd><p>dictionary of variables of ESDDNS section from configuration file</p>
+</dd>
+<dt><cite>self.dns_manager</cite>: Class instance</dt><dd><p>Initializes DomainManagement class</p>
+</dd>
+<dt><cite>self.wan_ip_state</cite>: Functor</dt><dd><p>WAN IP State as dictionary</p>
+</dd>
+<dt><cite>self.logger</cite><span class="classifier">Method instance</span></dt><dd><p>logger_wrapper() log wrapper instance</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>__call__(self):</dt><dd><p>Functor to return dynamic union of managed WAN IP and DNS A Record States
+when ESDDNS() class is called</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">sync_states</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/esddns.html#ESDDNS.sync_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><p>Manages both WAN IP and DNS A Records States for synchronization.
+Updates DNS A Record’s IP address if it’s out of sync.
+Logs each transaction.
+Gracefully exits if synchronization fails.</p>
+<p>Returns:
+<code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">'WAN_IP'},</span>
+<span class="pre">'record_state':</span> <span class="pre">{'in_sync':</span> <span class="pre">True,</span> <span class="pre">'record_data':</span> <span class="pre">{data}}}</span></code></p>
+<blockquote>
+<div><ul>
+<li><dl>
+<dt>dict: states union</dt><dd><ul class="simple">
+<li><p>When DNS Record state is in sync,</p></li>
+</ul>
+<p>Union of WAN IP and DNS A Record states.
+- When DNS A Record state is not in sync
+Updates DNS A Record IP with current WAN IP</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>exit: Quit ESDDNs with message</dt><dd><p>If can’t update DNS A record</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="esddns" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="api package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

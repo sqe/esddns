@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api package &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="esddns_service package" href="esddns_service.html" />
+    <link rel="prev" title="esddns package" href="esddns.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">esddns</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esddns.html">esddns package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">api package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.dns_manager">api.dns_manager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api.dns_manager.DomainManagement"><code class="docutils literal notranslate"><span class="pre">DomainManagement</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.get_ip">api.get_ip module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api.get_ip.WANIPState"><code class="docutils literal notranslate"><span class="pre">WANIPState</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.get_ip_stun">api.get_ip_stun module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api.get_ip_stun.STUNProvider"><code class="docutils literal notranslate"><span class="pre">STUNProvider</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api.get_ip_stun.get_stun_ip_results"><code class="docutils literal notranslate"><span class="pre">get_stun_ip_results()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.async_stun_discovery">api.async_stun_discovery module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api.async_stun_discovery.AsyncSTUNDiscovery"><code class="docutils literal notranslate"><span class="pre">AsyncSTUNDiscovery</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api.async_stun_discovery.STUNConfig"><code class="docutils literal notranslate"><span class="pre">STUNConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api.async_stun_discovery.STUNDatagramClient"><code class="docutils literal notranslate"><span class="pre">STUNDatagramClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.logs">api.logs module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api.logs.logger"><code class="docutils literal notranslate"><span class="pre">logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esddns_service.html">esddns_service package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">esddns</a></li>
+          <li class="breadcrumb-item"><a href="esddns.html">esddns package</a></li>
+      <li class="breadcrumb-item active">api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-package">
+<h1>api package<a class="headerlink" href="#api-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-api.dns_manager">
+<span id="api-dns-manager-module"></span><h2>api.dns_manager module<a class="headerlink" href="#module-api.dns_manager" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.dns_manager.</span></span><span class="sig-name descname"><span class="pre">DomainManagement</span></span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Class to manage DNS Domain and Records and it’s state</p>
+<p>Methods</p>
+<dl>
+<dt>__init__(self)</dt><dd><p>Initialize variables and helpers to manage DNS domains and records</p>
+<dl class="simple">
+<dt>Defaults</dt><dd><dl class="simple">
+<dt><cite>self.config</cite><span class="classifier">Object instance</span></dt><dd><p>ConfigParser instance</p>
+</dd>
+<dt><cite>self.config.read(‘dns.ini’)</cite><span class="classifier">file</span></dt><dd><p>Configuration file</p>
+</dd>
+<dt><cite>self.dns_config</cite><span class="classifier">dict</span></dt><dd><p>dictionary of variables of gandi section from configuration file</p>
+</dd>
+<dt><cite>self.header_auth</cite><span class="classifier">dict</span></dt><dd><p>dictionary for authorization header, read key from config file
+{“Authorization”: “Apikey ” + self.dns_config[“api_key”]}</p>
+</dd>
+<dt><cite>self.header_content_type</cite><span class="classifier">dict</span></dt><dd><p>dictonary for content-type header
+{“content-type”: “application/json”}</p>
+</dd>
+<dt><cite>self.logger</cite><span class="classifier">Method instance</span></dt><dd><p>logger_wrapper() log wrapper instance</p>
+</dd>
+<dt><cite>self.s</cite><span class="classifier">Session instance</span></dt><dd><p>requests.Session() instance</p>
+</dd>
+<dt><cite>self.dns_record_state</cite><span class="classifier">dict</span></dt><dd><p>default dns record state
+{“record_state”: {“in_sync”: False, “record_data”: {}}}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>exception_handler(func)</dt><dd><p>Exception handler decorator for HTTP requests, receives a function to run.
+Try/except wrapper function decorator handle and log exceptions.</p>
+</dd>
+<dt>get_all_domains()</dt><dd><p>Retrieves and returns all domains for your Account/Organization</p>
+</dd>
+<dt>get_target_domain_url()</dt><dd><p>Retrieves and returns target domain url from <cite>get_all_domains()</cite>,
+target_domain_fqdn supplied from config file</p>
+</dd>
+<dt>get_target_domain_records()</dt><dd><p>Retrieves and returns target domain’s all records from <cite>get_target_domain_url()</cite></p>
+</dd>
+<dt>get_target_domain_a_records()</dt><dd><p>Seek for target <cite>record_type_a</cite> and <cite>record_name_root</cite> supplied from
+config file, environment variable <cite>RECORD_NAME_ROOT</cite> should be exported,
+return if such A record found else log
+“Searching for the target A record” event and keep looking through
+all records</p>
+</dd>
+<dt>manage_a_record(ip=None)</dt><dd><p>Manages target DNS A record, if target A record not found from
+<cite>get_target_domain_a_records()</cite> creates the target A record
+from supplied argument`ip` and returns new A record data</p>
+</dd>
+<dt>a_record_state(ip=None)</dt><dd><p>Manages DNS A record state. Using <cite>manage_a_record(ip)</cite>
+Checks if target A record’s IP is equal to the supplied argument <cite>ip</cite>,
+Returns updated dns_record_state setting <cite>in_sync</cite> to True
+with filling record data
+If not A record’s IP is not same as supplied argument <cite>ip</cite> returns
+defaults <cite>dns_record_state</cite></p>
+</dd>
+<dt>create_record(rrset_name=None, rrset_type=None, ip=None, rrset_ttl=None)</dt><dd><p>Creates record with supplied args
+Run with <cite>&#64;exception_handler</cite> decorator</p>
+</dd>
+<dt>create_a_record(ip=None)</dt><dd><p>Creates A record via <cite>create_record()</cite> with supplying arguments
+from configuration file and an IP address</p>
+</dd>
+<dt>overwrite_record(rrset_name=None, rrset_type=None, rrset_value=None, rrset_ttl=None)</dt><dd><p>Since Gandi.net doesn’t offer <cite>update a record</cite> route they have <cite>overwrite</cite>
+functionality to update a single recordset with supplied arguments</p>
+</dd>
+<dt>update_a_record(ip=None)</dt><dd><p>Updates single A record data with supplied IP address and argument from
+config file</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.a_record_state">
+<span class="sig-name descname"><span class="pre">a_record_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.a_record_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.a_record_state" title="Permalink to this definition"></a></dt>
+<dd><p>Manages DNS A record state. Using <cite>manage_a_record(ip)</cite>
+Checks if target A record’s IP is equal to the supplied argument <cite>ip</cite>,
+Returns updated dns_record_state setting <cite>in_sync</cite> to True
+with filling record data
+If not A record’s IP is not same as supplied argument <cite>ip</cite> returns
+defaults <cite>dns_record_state</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p><code class="docutils literal notranslate"><span class="pre">{&quot;record_state&quot;:</span> <span class="pre">{&quot;in_sync&quot;:</span> <span class="pre">False/True,</span> <span class="pre">&quot;record_data&quot;:</span> <span class="pre">{</span> <span class="pre">data/empty</span> <span class="pre">}}}</span></code></p>
+<p>dict: A record state</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.create_a_record">
+<span class="sig-name descname"><span class="pre">create_a_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.create_a_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.create_a_record" title="Permalink to this definition"></a></dt>
+<dd><p>Creates A Record using create_record() function, supply
+record type “A” as rrset_type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ip</strong> (<em>str</em><em>, </em><em>optional</em>) – IP address to use to bind to A record. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>create_request_response, create_request.status_code, payload.</dt><dd><p>create_record request data</p>
+</dd>
+<dt>exit: Quit ESDDNS with error message</dt><dd><p>When create failed for some reason, log and exit response.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.create_record">
+<span class="sig-name descname"><span class="pre">create_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fqdn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.create_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.create_record" title="Permalink to this definition"></a></dt>
+<dd><p>Creates record with supplied args by constructing a request against
+<a class="reference external" href="https://api.gandi.net/docs/livedns/#post-v5-livedns-domains-fqdn-records">https://api.gandi.net/docs/livedns/#post-v5-livedns-domains-fqdn-records</a>
+Run with <cite>&#64;exception_handler</cite> decorator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rrset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Record name.</p></li>
+<li><p><strong>rrset_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Record type.</p></li>
+<li><p><strong>ip</strong> (<em>str</em><em>, </em><em>optional</em>) – IP address.</p></li>
+<li><p><strong>rrset_ttl</strong> (<em>int</em><em>, </em><em>optional</em>) – TTL.</p></li>
+<li><p><strong>headers</strong> (<em>dict</em>) – Union of headers.</p></li>
+<li><p><strong>Request</strong> (<em>POST</em>) – HTTP Request type.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>create_request_response, create_request.status_code, payload.</dt><dd><p>create_record request data</p>
+</dd>
+<dt>exit: Quit ESDDNS with error message</dt><dd><p>When create failed for some reason, log and exit response.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.exception_handler">
+<span class="sig-name descname"><span class="pre">exception_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.exception_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.exception_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Requests exception handling decorator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>function</em>) – Function with requests to decorate</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>Function passed throug exception handling</em></p></li>
+<li><p><em>If HTTP Exception caught</em> – log and exit with HTTP exception</p></li>
+<li><p><em>If Base request exception caught</em> – log and exit with base exception</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.get_all_domains">
+<span class="sig-name descname"><span class="pre">get_all_domains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.get_all_domains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.get_all_domains" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves and returns (does not display to user on purpose)
+all domains for in Account/Organization. Constructs a request and
+executes against <a class="reference external" href="https://api.gandi.net/docs/livedns/#get-v5-livedns-domains-fqdn">https://api.gandi.net/docs/livedns/#get-v5-livedns-domains-fqdn</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – from config file <cite>api_url_base</cite> + <cite>api_url_domains</cite></p></li>
+<li><p><strong>self.header_auth</strong> (<em>dict</em>) – dictionary for authorization header, read key from config file</p></li>
+<li><p><strong>Request</strong> (<em>HTTP</em>) – GET</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dict</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All domains in your Account / Organization</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.get_target_domain_a_records">
+<span class="sig-name descname"><span class="pre">get_target_domain_a_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fqdn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.get_target_domain_a_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.get_target_domain_a_records" title="Permalink to this definition"></a></dt>
+<dd><p>Seek for target <cite>record_type_a</cite> and <cite>record_name_root</cite> supplied from
+config file, return if such A record found else log
+“Searching for the target A record” event and keep looking through
+all records</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A record data
+- When A record’s type and name match with supplied values from config</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.get_target_domain_records">
+<span class="sig-name descname"><span class="pre">get_target_domain_records</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.get_target_domain_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.get_target_domain_records" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves and returns target domain’s all records from             <cite>get_target_domain_url()</cite>
+Run with <cite>&#64;exception_handler</cite> decorator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All records of the target domain</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.get_target_domain_url">
+<span class="sig-name descname"><span class="pre">get_target_domain_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.get_target_domain_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.get_target_domain_url" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves and returns target domain url from <cite>get_all_domains()</cite>,
+target_domain_fqdn supplied from config file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>str</strong> (<em>URL of target domain</em>) –</p>
+<ul>
+<li><p>When target domain fqdn same as the one from config file</p></li>
+</ul>
+</li>
+<li><p><strong>exit</strong> (<em>Quit ESDDNS with error message</em>) –</p>
+<ul>
+<li><p>When target domain fqdn is not same as the one from config file                 Iterate over next domain, if not found from any consequential loops                 log and exit <cite>msg_dns_domain_not_found</cite> from config file</p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.manage_a_record">
+<span class="sig-name descname"><span class="pre">manage_a_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.manage_a_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.manage_a_record" title="Permalink to this definition"></a></dt>
+<dd><p>Manages target DNS A record, if target A record not found from
+<cite>get_target_domain_a_records()</cite> creates the target A record
+from supplied argument <cite>ip</cite> and returns new A record data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ip</strong> (<em>str</em><em>, </em><em>optional</em>) – IP address to use to bind to A record. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>target A record data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.overwrite_record">
+<span class="sig-name descname"><span class="pre">overwrite_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fqdn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rrset_ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.overwrite_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.overwrite_record" title="Permalink to this definition"></a></dt>
+<dd><p>Overwrites record with supplied args by constructing a request against
+<a class="reference external" href="https://api.gandi.net/docs/livedns/#put-v5-livedns-domains-fqdn-records-rrset_name-rrset_type">https://api.gandi.net/docs/livedns/#put-v5-livedns-domains-fqdn-records-rrset_name-rrset_type</a>
+Run with <cite>&#64;exception_handler</cite> decorator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fqdn</strong> (<em>str</em><em>, </em><em>optional</em>) – fqdn.</p></li>
+<li><p><strong>rrset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Record name.</p></li>
+<li><p><strong>rrset_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Record type.</p></li>
+<li><p><strong>rrset_value</strong> (<em>str</em><em>, </em><em>optional</em>) – IP address.</p></li>
+<li><p><strong>rrset_ttl</strong> (<em>int</em><em>, </em><em>optional</em>) – TTL.</p></li>
+<li><p><strong>headers</strong> (<em>dict</em>) – Union of headers.</p></li>
+<li><p><strong>Request</strong> (<em>PUT</em>) – HTTP Request type.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>overwrite_record_request</cite> response and it’s <cite>status_code</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.dns_manager.DomainManagement.update_a_record">
+<span class="sig-name descname"><span class="pre">update_a_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/dns_manager.html#DomainManagement.update_a_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.dns_manager.DomainManagement.update_a_record" title="Permalink to this definition"></a></dt>
+<dd><p>Updates A record with <cite>overwrite_record()</cite> function, supply
+<cite>target_domain_fqdn</cite>, <cite>record_name_root</cite>, <cite>record_type_a</cite>, <cite>record_ttl</cite>
+from config file, and IP address from another Class to manage A record</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ip</strong> (<em>str</em><em>, </em><em>optional</em>) – IP address to use to bind to A record. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>update_a_record</cite> response, and <cite>status_code</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-api.get_ip">
+<span id="api-get-ip-module"></span><h2>api.get_ip module<a class="headerlink" href="#module-api.get_ip" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="api.get_ip.WANIPState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.get_ip.</span></span><span class="sig-name descname"><span class="pre">WANIPState</span></span><a class="reference internal" href="_modules/api/get_ip.html#WANIPState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip.WANIPState" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Class to retrieve Public WAN IP from multiple external sources
+(STUN protocol and/or HTTP services) and return as a State</p>
+<p>IP Discovery Methods (Configurable):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>STUN Protocol (Optional):</dt><dd><p>Enabled when [STUNConfig] section exists in dns.ini
+Uses RFC 8489 compliant STUN protocol over UDP and TCP
+Async/concurrent queries to multiple STUN servers
+Retry logic with exponential backoff
+Typically ~2x faster than HTTP services</p>
+</dd>
+<dt>HTTP Services (Optional):</dt><dd><p>Enabled when [WANIPState] section exists in dns.ini
+Multi-threaded concurrent HTTP requests to external IP check services
+Retry logic for transient failures (HTTP status codes: 408, 429, 449, 500, 502, 503, 504, 509)</p>
+</dd>
+<dt>Note: At least one method ([STUNConfig] or [WANIPState]) must be configured.</dt><dd><p>Both can be enabled for redundancy - STUN runs first, HTTP verifies.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Methods:</p>
+<dl>
+<dt>__init__(self):</dt><dd><p>Initiates WANIPState class and performs IP discovery.</p>
+<dl class="simple">
+<dt>Configuration Loading:</dt><dd><p><cite>self.config</cite> : ConfigParser instance
+<cite>self.config.read(‘dns.ini’)</cite> : Loads configuration file</p>
+</dd>
+<dt>HTTP Services (if [WANIPState] exists):</dt><dd><p><cite>self.http_enabled</cite> : bool - True if HTTP services configured
+<cite>self.ip_conf</cite> : dict - WANIPState section variables
+<cite>self.ip_check_services</cite> : list - External HTTP IP check service URLs
+<cite>self.retry_attempts</cite> : int - Number of retry attempts (default: 3)
+<cite>self.retry_interval</cite> : int - Cooldown interval in seconds (default: 5)
+<cite>self.s</cite> : requests.Session - HTTP session for requests</p>
+</dd>
+<dt>STUN Protocol (if [STUNConfig] exists and module available):</dt><dd><p><cite>self.stun_enabled</cite> : bool - True if STUN protocol configured
+<cite>self.stun_provider</cite> : STUNProvider - STUN query handler
+Queries multiple STUN servers concurrently (UDP and TCP)
+Retry logic with exponential backoff</p>
+</dd>
+<dt>Common:</dt><dd><p><cite>self.ipaddress_list</cite> : list - Collected valid IPs from all sources
+<cite>self._wan_ip_state</cite> : dict - <cite>{“wan_ip_state”: {“usable”: False, “IP”: {}}}</cite>
+<cite>self.ips_extraction()</cite> : Executes IP discovery from configured sources</p>
+</dd>
+</dl>
+</dd>
+<dt>__call__(self):</dt><dd><p>Functor to return WAN IP State when WANIPState() class is called
+Returns: self.wan_ip_state()</p>
+</dd>
+<dt>retry_request(self, svc, func=None)</dt><dd><p>HTTP retry decorator for request function on external service.
+Used when HTTP service returns retriable status codes.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>svc (str): External service URL
+func (function): Function to retry</p>
+</dd>
+</dl>
+</dd>
+<dt>get_wan_ip(self, svc=None)</dt><dd><p>Retrieves Public WAN IP from external HTTP service.
+Retries if HTTP STATUS CODE is in list: [408, 429, 449, 500, 502, 503, 504, 509]
+Gracefully handles Request Exceptions</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>tuple: (IP, service) - IPv4 string and service URL, or (None, service) on failure</p>
+</dd>
+</dl>
+</dd>
+<dt>ips_extraction(self)</dt><dd><p>Executes IP discovery from configured sources with priority order.</p>
+<dl class="simple">
+<dt>Priority Order:</dt><dd><ol class="arabic simple">
+<li><p>STUN Protocol (if enabled) - Queries STUN servers with retry logic</p></li>
+<li><p>HTTP Services (if enabled) - Multi-threaded HTTP queries with retry logic</p></li>
+</ol>
+</dd>
+<dt>Validation:</dt><dd><ul class="simple">
+<li><p>Validates IPv4 format using ipaddress.IPv4Address</p></li>
+<li><p>Checks global reachability (filters private/reserved IPs)</p></li>
+<li><p>See: <a class="reference external" href="https://www.iana.org/assignments/iana-ipv4-special-registry/">https://www.iana.org/assignments/iana-ipv4-special-registry/</a></p></li>
+</ul>
+</dd>
+<dt>Behavior:</dt><dd><ul class="simple">
+<li><p>Failed queries returning None are filtered out</p></li>
+<li><p>Adds all valid IPs to self.ipaddress_list</p></li>
+<li><p>Skips gracefully on malformed or non-global IPs</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>wan_ip_state(self)</dt><dd><p>Returns WAN IP State dictionary with validation of all collected IPs.</p>
+<dl class="simple">
+<dt>Validation Logic:</dt><dd><ul class="simple">
+<li><p>Compares all IPs in ipaddress_list (from STUN and/or HTTP)</p></li>
+<li><p>All IPs must match or only one IP collected</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>dict: <cite>{“wan_ip_state”: {“usable”: True/False, “IP”: “x.x.x.x” or {}}}</cite></p>
+</dd>
+<dt>Cases:</dt><dd><p>Multiple IPs Match: usable=True (e.g., STUN + 2 HTTP all return same IP)
+Single IP Collected: usable=True (e.g., only STUN succeeded)
+IP Mismatch: usable=False, exits (e.g., STUN=1.2.3.4, HTTP=5.6.7.8)
+No IPs Collected: usable=False, exits</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip.WANIPState.get_wan_ip">
+<span class="sig-name descname"><span class="pre">get_wan_ip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip.html#WANIPState.get_wan_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip.WANIPState.get_wan_ip" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves Public WAN IP from external service.
+Retries if HTTP STATUS CODE is in list:[408, 429, 449, 500, 502, 503, 504, 509]
+Gracefully exits on Request Exceptions, skips if IP address not IPv4 compliant</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>svc</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>raise_for_status</strong><strong>(</strong><strong>)</strong> – </p></li>
+<li><p><strong>HTTP Error Exceptions</strong> – </p></li>
+<li><p><strong>Request Exceptions</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>(IP, service)</strong> (<em>tuple</em>)</p></li>
+<li><p><em>if IPv4 found</em> – <cite>(‘xxx.xxx.xxx.xxx’, ‘service’)</cite></p></li>
+<li><p><em>if IPv4 not found or during exception handling</em> – <cite>(None, ‘service’)</cite></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<section id="doctest">
+<h3>Doctest<a class="headerlink" href="#doctest" title="Permalink to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WANIPState</span><span class="p">()</span><span class="o">.</span><span class="n">get_wan_ip</span><span class="p">(</span><span class="s2">&quot;https://bcheckip.amazonaws.com/&quot;</span><span class="p">)</span>
+<span class="go">(None, &#39;https://bcheckip.amazonaws.com/&#39;)</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip.WANIPState.ips_extraction">
+<span class="sig-name descname"><span class="pre">ips_extraction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip.html#WANIPState.ips_extraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip.WANIPState.ips_extraction" title="Permalink to this definition"></a></dt>
+<dd><p>Dynamic multi-threaded extraction of valid Public WAN IPs from services
+via get_wan_ip method.</p>
+<p>Creates a concurrent worker threads for each external service in the config file
+to extract IPs addresses.
+Gracefully skips if IP is malformed, or if WAN IP is not Globally Reachable
+<a class="reference external" href="https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml">https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml</a></p>
+<p>Adds extracted IPs to discovered ipaddresses list ipaddress_list</p>
+<section id="defaults">
+<h3>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self.ip_check_services<span class="classifier">list</span></dt><dd><p>list of external IP check services from the config file</p>
+</dd>
+<dt>max_workers<span class="classifier">int</span></dt><dd><p>value : length of self.ip_check_services list
+maximum amount of concurrent worker threads to utilize.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip.WANIPState.retry_request">
+<span class="sig-name descname"><span class="pre">retry_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip.html#WANIPState.retry_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip.WANIPState.retry_request" title="Permalink to this definition"></a></dt>
+<dd><p>Decorator for request retry function func on external service svc,
+Used if an external service is in flaky state but with retriable
+http status code.</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>svc<span class="classifier">str</span></dt><dd><p>External service url</p>
+</dd>
+<dt>func<span class="classifier">function</span></dt><dd><p>function to retry</p>
+</dd>
+</dl>
+</section>
+<section id="id1">
+<h3>Defaults:<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self.retry_attempts<span class="classifier">int</span></dt><dd><p>number of retry attempts</p>
+</dd>
+<dt>self.retry_interval<span class="classifier">int</span></dt><dd><p>cooldown interval, multiplied to retry attempt on each iteration</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip.WANIPState.wan_ip_state">
+<span class="sig-name descname"><span class="pre">wan_ip_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip.html#WANIPState.wan_ip_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip.WANIPState.wan_ip_state" title="Permalink to this definition"></a></dt>
+<dd><p>Returns WAN IP State dictionary, contains  usable state (True or False) and,
+Validated Globally Reachable WAN IP or empty value.</p>
+<p>Gracefully skips and exits if Unable to collect any IPs or if Collected IP
+addresses do not match</p>
+<section id="examples">
+<h3>Examples:<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h3>
+<p>WAN IP is usable: <code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">'xxx.xxx.xxx.xxx'}</span></code></p>
+<p>Else: <code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">False,</span> <span class="pre">'IP':</span> <span class="pre">{}}}</span></code></p>
+</section>
+<section id="id2">
+<h3>Defaults<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>self.ipaddress_list<span class="classifier">list</span></dt><dd><p>list of extracted WAN IP addresses</p>
+</dd>
+<dt>self._wan_ip_state: dict</dt><dd><p>dictionary containing usable state of collected IPs, defaults to False</p>
+</dd>
+</dl>
+<dl class="field-list">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">False</span> <span class="pre">/</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">{WAN</span> <span class="pre">IP</span> <span class="pre">address}}}</span></code> – WAN IP State dictionary, contains “usable” state (True or False) and,
+Validated Globally Reachable WAN IP from collected self.ipaddress_list.</p></li>
+<li><p><em>Case A</em> – Collected IP addresses don’t match
+Lengh and cardinality of ip_list_uniques is not 0 or 1, simply &gt; 1,
+0 when no IP collected, 1 when IPs collected
+and deduplication yields one value
+Logs mismatch event and exits, without modifying self._wan_ip_state</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">False,</span> <span class="pre">'IP':</span> <span class="pre">{}}}</span></code></p>
+</li>
+<li><p><em>Case B</em> – IPs from all services match
+Cardinality of set over self.ipaddress_list is 1
+and length of the self.ipaddress_list is greater than one
+Updates self._wan_ip_state to True, for quick access return the first
+IP address from the list since the values will be same</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">'xxx.xxx.xxx.xxx'}}</span></code></p>
+</li>
+<li><p><em>Case C</em> – At least one valid IP was collected
+Length and cardinality of self.ipaddress_list and set over it yields 1
+Updates self._wan_ip_state to True, for quick access return the first
+IP address from the list since the values will be same</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">True,</span> <span class="pre">'IP':</span> <span class="pre">'xxx.xxx.xxx.xxx'}}</span></code></p>
+</li>
+<li><p><em>Case D</em> – Unable to collect IP from any services
+Length of self.ipaddress_list is 0
+Logs IP not collected event and exits, doesn’t modify self._wan_ip_state</p>
+<p><code class="docutils literal notranslate"><span class="pre">{'wan_ip_state':</span> <span class="pre">{'usable':</span> <span class="pre">False,</span> <span class="pre">'IP':</span> <span class="pre">{}}}</span></code></p>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-api.get_ip_stun">
+<span id="api-get-ip-stun-module"></span><h2>api.get_ip_stun module<a class="headerlink" href="#module-api.get_ip_stun" title="Permalink to this heading"></a></h2>
+<p>stun_ip_results.py</p>
+<p>STUN-based IP provider compatible with esddns get_ip.py interface.
+Provides a Provider class that fetches public IP using STUN protocol.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="api.get_ip_stun.STUNProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.get_ip_stun.</span></span><span class="sig-name descname"><span class="pre">STUNProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'stun'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfgfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dns.ini'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip_stun.html#STUNProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip_stun.STUNProvider" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>STUN-based IP provider compatible with esddns get_ip.py Provider interface.</p>
+<dl class="simple">
+<dt>Usage:</dt><dd><p>provider = STUNProvider(name=”stun-udp”, cfgfile=”dns.ini”)
+ip, service = provider.get_wan_ip()</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip_stun.STUNProvider.get_wan_ip">
+<span class="sig-name descname"><span class="pre">get_wan_ip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/api/get_ip_stun.html#STUNProvider.get_wan_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip_stun.STUNProvider.get_wan_ip" title="Permalink to this definition"></a></dt>
+<dd><p>Fetches the public IP address using STUN protocol with retry logic.
+Compatible with esddns WANIPState.get_wan_ip() interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>svc</strong> – Optional specific STUN server (format: “stun:host:port:udp” or “stun:host:port:tcp”)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>port that provided the IP.
+Returns (None, service) if no IP could be obtained.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (IP, service) where service identifies the STUN server</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.get_ip_stun.STUNProvider.retry_request">
+<span class="sig-name descname"><span class="pre">retry_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/get_ip_stun.html#STUNProvider.retry_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip_stun.STUNProvider.retry_request" title="Permalink to this definition"></a></dt>
+<dd><p>Retry wrapper for STUN query function.
+Similar to HTTP retry_request decorator pattern.</p>
+<section id="id3">
+<h3>Parameters:<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>func<span class="classifier">function</span></dt><dd><p>function to retry (should return (ip, service) tuple)</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>result<span class="classifier">tuple</span></dt><dd><p>(IP, service) from successful attempt, or (None, None) if all fail</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.get_ip_stun.get_stun_ip_results">
+<span class="sig-prename descclassname"><span class="pre">api.get_ip_stun.</span></span><span class="sig-name descname"><span class="pre">get_stun_ip_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfgfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dns.ini'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/api/get_ip_stun.html#get_stun_ip_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.get_ip_stun.get_stun_ip_results" title="Permalink to this definition"></a></dt>
+<dd><p>Legacy function for backward compatibility.
+Returns a list of (ip, service_name) tuples from STUN queries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfgfile</strong> – Path to DNS/STUN config file (default ‘dns.ini’)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(IPv4 or None, service string)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-api.async_stun_discovery">
+<span id="api-async-stun-discovery-module"></span><h2>api.async_stun_discovery module<a class="headerlink" href="#module-api.async_stun_discovery" title="Permalink to this heading"></a></h2>
+<p>async_stun_discovery.py</p>
+<p>Discover your public IP address and port using the STUN protocol (RFC 8489) over UDP and TCP.</p>
+<p>This module queries current publicly-available STUN servers (auto-updated lists, HTTP via aiohttp),
+and parses their responses to reveal the NAT-mapped public address for your machine. All queries run concurrently using asyncio.</p>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>RFC 8489: Session Traversal Utilities for NAT (STUN)
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8489">https://datatracker.ietf.org/doc/html/rfc8489</a></p></li>
+</ul>
+<dl class="simple">
+<dt>Sample usage:</dt><dd><p>python async_stun_discovery.py</p>
+</dd>
+</dl>
+<p>Author: Your Name
+Date: 2025-10-07</p>
+<hr class="docutils" />
+<dl class="simple">
+<dt>Relevant RFC 8489 Example:</dt><dd><p>00 01 00 00 21 12 a4 42 &lt;12 random bytes&gt;
+- 00 01 : Binding Request
+- 00 00 : No attributes
+- 21 12 a4 42 : Magic cookie
+- &lt;12 bytes&gt;: Random Transaction ID</p>
+</dd>
+</dl>
+<hr class="docutils" />
+<p>STUN Server Response Overview:</p>
+<p>The STUN server sends back a Binding Success Response message:
+- Header: Message Type (e.g., 0x0101), Length, Magic Cookie (0x2112A442), matching Transaction ID.
+- TLV attributes follow the header.
+- The XOR-MAPPED-ADDRESS attribute (0x0020) contains your public IP and port, obfuscated using the magic cookie.</p>
+<hr class="docutils" />
+<p>struct format explanations:
+- ‘!’   : network byte order (big-endian)
+- ‘H’   : unsigned short (2 bytes)
+- ‘I’   : unsigned int (4 bytes)
+- ‘s’   : char[] bytes array
+- ‘!HHI12s’: STUN header; ‘!HH’: attribute type/length.</p>
+<p>Official doc: <a class="reference external" href="https://docs.python.org/3/library/struct.html#format-strings">https://docs.python.org/3/library/struct.html#format-strings</a></p>
+<hr class="docutils" />
+<dl class="py class">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.async_stun_discovery.</span></span><span class="sig-name descname"><span class="pre">AsyncSTUNDiscovery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfgfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dns.ini'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Async STUN client using config from dns.ini [STUNConfig].
+Call .main() for demo/testing, or use individual async methods.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.build_stun_binding_request">
+<span class="sig-name descname"><span class="pre">build_stun_binding_request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.build_stun_binding_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.build_stun_binding_request" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a RFC 8489-compliant (Section 6) STUN binding request message.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>bytes: 20-byte binary header to be sent as Binding Request, ready for UDP/TCP transmission.</p>
+</dd>
+</dl>
+<p>RFC 8489 Section 6 describes the fixed header format:
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+<a href="#id5"><span class="problematic" id="id6">|0 0|</span></a>     STUN Message Type     |         Message Length        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Magic Cookie                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                     Transaction ID (96 bits)                 |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</p>
+<ul class="simple">
+<li><p>Message Type = 0x0001 for Binding Request</p></li>
+<li><p>Message Length = 0x0000 (no attributes included in this minimal request)</p></li>
+<li><p>Magic Cookie = 0x2112A442</p></li>
+<li><p>Transaction ID = 12 bytes random value for message correlation and security</p></li>
+</ul>
+<p>Format: struct.pack(‘!HHI12s’, …):
+- ‘!’    : network byte order (big-endian)
+- ‘H’    : unsigned short (Message Type)
+- ‘H’    : unsigned short (Message Length)
+- ‘I’    : unsigned int (Magic Cookie)
+- ’12s’  : 12-byte string (Transaction ID)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.load_host_list">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_host_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.load_host_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.load_host_list" title="Permalink to this definition"></a></dt>
+<dd><p>Asynchronously download and parse list of STUN servers from URL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> (<em>str</em>) – Text file with “host:port” per line.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of (host, port) tuples.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Documentation:</dt><dd><p>Uses aiohttp for concurrent HTTP download.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.main">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.main" title="Permalink to this definition"></a></dt>
+<dd><p>Asynchronous entry point.
+- Downloads UDP and TCP host lists (configurable in dns.ini).
+- Dispatches concurrent STUN queries to configured servers.
+- Logs each query result.</p>
+<dl class="simple">
+<dt>Usage:</dt><dd><p>python async_stun_discovery.py</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>RFC 8489 Section 6.2.1, 6.2.2</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.parse_xor_mapped_address">
+<span class="sig-name descname"><span class="pre">parse_xor_mapped_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.parse_xor_mapped_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.parse_xor_mapped_address" title="Permalink to this definition"></a></dt>
+<dd><p>Parses the XOR-MAPPED-ADDRESS attribute from a STUN response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytes</em>) – Full response message.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(public_ip (str), public_port (int)), or (None, None) if not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p>Format: attribute header is struct.unpack(‘!HH’, …)
+- ‘!’: network byte order
+- ‘H’: attribute type (2 bytes)
+- ‘H’: attribute length (2 bytes)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_tcp">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">query_stun_tcp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.query_stun_tcp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_tcp" title="Permalink to this definition"></a></dt>
+<dd><p>Asynchronously send a STUN Binding Request over TCP and parse the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<em>str</em>) – Target STUN server host.</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – Target TCP port.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(public_ip (str), public_port (int)), or (None, None).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Documentation:</dt><dd><p>Uses asyncio streams (open_connection) for TCP I/O.
+Request/response is sent and received in binary form.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_udp">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">query_stun_udp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/api/async_stun_discovery.html#AsyncSTUNDiscovery.query_stun_udp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.AsyncSTUNDiscovery.query_stun_udp" title="Permalink to this definition"></a></dt>
+<dd><p>Asynchronously send a STUN Binding Request over UDP and parse the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<em>str</em>) – Target STUN server hostname/IP.</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – UDP port.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(public_ip (str), public_port (int)), or (None, None) if failed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Documentation:</dt><dd><p>Uses asyncio loop’s send/recv capabilities via a DatagramProtocol transport.
+If a response arrives, parses using parse_xor_mapped_address.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.async_stun_discovery.</span></span><span class="sig-name descname"><span class="pre">STUNConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfgfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dns.ini'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Loads and holds STUN variables from dns.ini [STUNConfig] section.
+Provides sane defaults if not present.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">api.async_stun_discovery.</span></span><span class="sig-name descname"><span class="pre">STUNDatagramClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DatagramProtocol</span></code></p>
+<p>Helper for asynchronous UDP STUN exchange; stores response for further parsing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient.connection_lost">
+<span class="sig-name descname"><span class="pre">connection_lost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient.connection_lost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient.connection_lost" title="Permalink to this definition"></a></dt>
+<dd><p>Called when the connection is lost or closed.</p>
+<p>The argument is an exception object or None (the latter
+meaning a regular EOF is received or the connection was
+aborted or closed).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient.connection_made">
+<span class="sig-name descname"><span class="pre">connection_made</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transport</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient.connection_made"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient.connection_made" title="Permalink to this definition"></a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>The argument is the transport representing the pipe connection.
+To receive data, wait for data_received() calls.
+When the connection is closed, connection_lost() is called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient.datagram_received">
+<span class="sig-name descname"><span class="pre">datagram_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">addr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient.datagram_received"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient.datagram_received" title="Permalink to this definition"></a></dt>
+<dd><p>Called when some datagram is received.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient.error_received">
+<span class="sig-name descname"><span class="pre">error_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient.error_received"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient.error_received" title="Permalink to this definition"></a></dt>
+<dd><p>Called when a send or receive operation raises an OSError.</p>
+<p>(Other than BlockingIOError or InterruptedError.)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="api.async_stun_discovery.STUNDatagramClient.get_response">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/api/async_stun_discovery.html#STUNDatagramClient.get_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.async_stun_discovery.STUNDatagramClient.get_response" title="Permalink to this definition"></a></dt>
+<dd><p>Await the response (datagram) with a timeout.
+Returns: bytes or None</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-api.logs">
+<span id="api-logs-module"></span><h2>api.logs module<a class="headerlink" href="#module-api.logs" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="api.logs.logger">
+<span class="sig-prename descclassname"><span class="pre">api.logs.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/logs.html#logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.logs.logger" title="Permalink to this definition"></a></dt>
+<dd><p>A Wrapper for logging to write both console and a log file</p>
+<section id="id4">
+<h3>Defaults<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>config.read(‘dns.ini’)<span class="classifier">file</span></dt><dd><p>configuration file</p>
+</dd>
+<dt>log_file<span class="classifier">str</span></dt><dd><p>filename for logs in configuration file</p>
+</dd>
+<dt>console_output<span class="classifier">boolean</span></dt><dd><p>Boolean value to write to both console and file or only file</p>
+</dd>
+</dl>
+<dl class="field-list">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><strong>Instance</strong> (<em>Logger Class instance</em>) –</p>
+<dl class="simple">
+<dt>If config[“log”][“log_to_console”] is True</dt><dd><p>Logging enabled for both file and console</p>
+</dd>
+<dt>If config[“log”][“log_to_console”] is False</dt><dd><p>Logging to file enabled, console logs are disabled</p>
+</dd>
+<dt>If config[“log”][“log_to_console”] not in (“True” or “False”)</dt><dd><p>exits with message to set True or False in configuration</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>Log format</strong> (<em>%(asctime)s %(levelname)s %(message)s</em>)</p></li>
+<li><p><strong>Log encoding</strong> (<em>utf-8</em>)</p></li>
+<li><p><strong>Log level</strong> (<em>DEBUG</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-api" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="esddns.html" class="btn btn-neutral float-left" title="esddns package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="esddns_service.html" class="btn btn-neutral float-right" title="esddns_service package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+1. Get the external IP of the LoadBalancer service:
+{{- if eq .Values.service.type "LoadBalancer" }}
+  kubectl get svc esddns-service -n {{ .Values.namespace.name }} --watch
+  
+  Wait for the EXTERNAL-IP to be assigned, then:
+  EXTERNAL_IP=$(kubectl get svc esddns-service -n {{ .Values.namespace.name }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo "ESDDNS Service available at: http://$EXTERNAL_IP"
+{{- else if eq .Values.service.type "NodePort" }}
+  NODE_PORT=$(kubectl get svc esddns-service -n {{ .Values.namespace.name }} -o jsonpath='{.spec.ports[0].nodePort}')
+  NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+  [ -z "$NODE_IP" ] && NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+  echo "ESDDNS Service available at: http://$NODE_IP:$NODE_PORT"
+{{- else }}
+  kubectl port-forward -n {{ .Values.namespace.name }} svc/esddns-service 8080:{{ .Values.service.port }}
+  echo "ESDDNS Service available at: http://localhost:8080"
+{{- end }}
+
+2. Verify the operator is running:
+  kubectl get all -n {{ .Values.namespace.name }}
+
+3. Check operator logs:
+  kubectl logs -n {{ .Values.namespace.name }} -l app=esddns-operator -f
+
+4. Verify DNS records are being updated:
+  kubectl logs -n {{ .Values.namespace.name }} -l app=esddns-service -f
+
+5. Access operator metrics (if monitoring enabled):
+  kubectl port-forward -n {{ .Values.namespace.name }} daemonset/esddns-operator-daemon 8080:8080
+  curl http://localhost:8080/metrics
+
+{{ if not .Values.gandi.apiKey }}
+⚠️  IMPORTANT: You must set the Gandi API key before the operator can function.
+   Upgrade the release with:
+   helm upgrade {{ .Release.Name }} esddns-operator --set gandi.apiKey=<your-api-key>
+{{ end }}
+
+For more information, visit: https://github.com/sqe/esddns

@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esddns-service
+  namespace: esddns-system
+  labels:
+    app: esddns-service
+    component: web
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  
+  selector:
+    matchLabels:
+      app: esddns-service
+      component: web
+  
+  template:
+    metadata:
+      labels:
+        app: esddns-service
+        component: web
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "51339"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: esddns-service
+      
+      initContainers:
+      - name: copy-config
+        image: busybox:1.36
+        command: ['sh', '-c', 'cp /etc/esddns/dns.ini /config/dns.ini']
+        volumeMounts:
+        - name: config-map
+          mountPath: /etc/esddns
+        - name: config-volume
+          mountPath: /config
+      
+      containers:
+      - name: esddns-web
+        image: esddns:latest
+        imagePullPolicy: Always
+        
+        command:
+        - python
+        - -m
+        - esddns_service.esddns_endpoint
+        
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: esddns-gandi-credentials
+              key: api-key
+        - name: TARGET_DOMAIN_FQDN
+          valueFrom:
+            configMapKeyRef:
+              name: esddns-config
+              key: target-domain
+        - name: RECORD_NAME_ROOT
+          valueFrom:
+            configMapKeyRef:
+              name: esddns-config
+              key: record-name
+        - name: RECORD_TYPE_A
+          value: "A"
+        - name: RECORD_TTL
+          valueFrom:
+            configMapKeyRef:
+              name: esddns-config
+              key: record-ttl
+        - name: FLASK_ENV
+          value: "production"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        
+        ports:
+        - name: web
+          containerPort: 51339
+          protocol: TCP
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: esddns-log
+          mountPath: /app/logs
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        livenessProbe:
+          httpGet:
+            path: /
+            port: web
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /raw
+            port: web
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      
+      terminationGracePeriodSeconds: 30
+      
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - esddns-service
+              topologyKey: kubernetes.io/hostname
+      
+      volumes:
+      - name: config-map
+        configMap:
+          name: esddns-config
+      - name: config-volume
+        emptyDir: {}
+      - name: esddns-log
+        emptyDir: {}

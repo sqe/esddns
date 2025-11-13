@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: esddns-operator-helm-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: esddns-dev
+  source:
+    repoURL: https://github.com/sqe/esddns
+    targetRevision: HEAD
+    path: helm/esddns-operator
+    helm:
+      releaseName: esddns-operator
+      valueFiles:
+        - values.yaml
+        - values-development.yaml
+      parameters:
+        - name: replicaCount
+          value: "1"
+        - name: environment
+          value: "development"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: esddns-operator-dev
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

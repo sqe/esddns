@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api.get_ip_stun &mdash; ESDDNS 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ESDDNS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">ESDDNS usage examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">esddns</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ESDDNS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.get_ip_stun</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for api.get_ip_stun</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">stun_ip_results.py</span>
+
+<span class="sd">STUN-based IP provider compatible with esddns get_ip.py interface.</span>
+<span class="sd">Provides a Provider class that fetches public IP using STUN protocol.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.async_stun_discovery</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSTUNDiscovery</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logs</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+
+
+<div class="viewcode-block" id="STUNProvider"><a class="viewcode-back" href="../../api.html#api.get_ip_stun.STUNProvider">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">STUNProvider</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    STUN-based IP provider compatible with esddns get_ip.py Provider interface.</span>
+<span class="sd">    </span>
+<span class="sd">    Usage:</span>
+<span class="sd">        provider = STUNProvider(name=&quot;stun-udp&quot;, cfgfile=&quot;dns.ini&quot;)</span>
+<span class="sd">        ip, service = provider.get_wan_ip()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stun&quot;</span><span class="p">,</span> <span class="n">cfgfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dns.ini&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfgfile</span> <span class="o">=</span> <span class="n">cfgfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_service</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discovery</span> <span class="o">=</span> <span class="n">AsyncSTUNDiscovery</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfgfile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="o">.</span><span class="n">stun_conf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">retry_cooldown_seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">retry_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="STUNProvider.retry_request"><a class="viewcode-back" href="../../api.html#api.get_ip_stun.STUNProvider.retry_request">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">retry_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retry wrapper for STUN query function.</span>
+<span class="sd">        Similar to HTTP retry_request decorator pattern.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        func : function</span>
+<span class="sd">            function to retry (should return (ip, service) tuple)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        result : tuple</span>
+<span class="sd">            (IP, service) from successful attempt, or (None, None) if all fail</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">retry</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">retry</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">retry_interval</span> <span class="o">=</span> <span class="n">retry</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_interval</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] RETRY: Attempt #</span><span class="si">{</span><span class="n">retry</span><span class="si">}</span><span class="s2">; Cooldown </span><span class="si">{</span><span class="n">retry_interval</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="n">retry_interval</span><span class="p">)</span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Success - got an IP</span>
+                    <span class="k">return</span> <span class="n">result</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">retry</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Failed to get IP from STUN servers, will retry...&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">retry</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Error on attempt #</span><span class="si">{</span><span class="n">retry</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, will retry...&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Error after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span><span class="si">}</span><span class="s2"> attempts: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Failed to get IP address from STUN servers after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_attempts</span><span class="si">}</span><span class="s2"> attempts.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>    </div>
+<div class="viewcode-block" id="STUNProvider.get_wan_ip"><a class="viewcode-back" href="../../api.html#api.get_ip_stun.STUNProvider.get_wan_ip">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_wan_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches the public IP address using STUN protocol with retry logic.</span>
+<span class="sd">        Compatible with esddns WANIPState.get_wan_ip() interface.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            svc: Optional specific STUN server (format: &quot;stun:host:port:udp&quot; or &quot;stun:host:port:tcp&quot;)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (IP, service) where service identifies the STUN server:port that provided the IP.</span>
+<span class="sd">            Returns (None, service) if no IP could be obtained.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Fetching IP via STUN protocol...&quot;</span><span class="p">)</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">_stun_query</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Inner query function to be wrapped by retry_request&quot;&quot;&quot;</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_query_stun</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+                <span class="n">udp_hosts</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="o">.</span><span class="n">load_host_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">udp_url</span><span class="p">)</span>
+                <span class="n">tcp_hosts</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="o">.</span><span class="n">load_host_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">tcp_url</span><span class="p">)</span>
+                
+                <span class="n">udp_hosts</span> <span class="o">=</span> <span class="n">udp_hosts</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">udp_limit</span><span class="p">]</span>
+                <span class="n">tcp_hosts</span> <span class="o">=</span> <span class="n">tcp_hosts</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">tcp_limit</span><span class="p">]</span>
+                
+                <span class="c1"># Build list of (task, service_name) tuples</span>
+                <span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">udp_hosts</span><span class="p">:</span>
+                    <span class="n">service_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;stun:</span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">:udp&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting new STUN UDP query: </span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="o">.</span><span class="n">query_stun_udp</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">service_name</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tcp_hosts</span><span class="p">:</span>
+                    <span class="n">service_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;stun:</span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">:tcp&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting new STUN TCP query: </span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="o">.</span><span class="n">query_stun_tcp</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">service_name</span><span class="p">))</span>
+                
+                <span class="c1"># Execute all queries</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">])</span>
+                
+                <span class="c1"># Find first successful result</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+                    <span class="n">service_name</span> <span class="o">=</span> <span class="n">queries</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Successfully obtained IP: </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="n">ip</span><span class="p">,</span> <span class="n">service_name</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Non-IPv4 response from </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">continue</span>
+                
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            
+            <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">_query_stun</span><span class="p">())</span>
+        
+        <span class="c1"># Using retry_request decorator pattern</span>
+        <span class="n">ip</span><span class="p">,</span> <span class="n">service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_request</span><span class="p">(</span><span class="n">_stun_query</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_service</span> <span class="o">=</span> <span class="n">service</span>
+        
+        <span class="k">return</span> <span class="n">ip</span><span class="p">,</span> <span class="n">service</span></div></div>
+
+
+<div class="viewcode-block" id="get_stun_ip_results"><a class="viewcode-back" href="../../api.html#api.get_ip_stun.get_stun_ip_results">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_stun_ip_results</span><span class="p">(</span><span class="n">cfgfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dns.ini&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Legacy function for backward compatibility.</span>
+<span class="sd">    Returns a list of (ip, service_name) tuples from STUN queries.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        cfgfile: Path to DNS/STUN config file (default &#39;dns.ini&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        List of tuples: (IPv4 or None, service string)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running STUN IP queries...&quot;</span><span class="p">)</span>
+    <span class="n">discovery</span> <span class="o">=</span> <span class="n">AsyncSTUNDiscovery</span><span class="p">(</span><span class="n">cfgfile</span><span class="p">)</span>
+    <span class="n">conf</span> <span class="o">=</span> <span class="n">discovery</span><span class="o">.</span><span class="n">stun_conf</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_results</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="n">udp_hosts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">discovery</span><span class="o">.</span><span class="n">load_host_list</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">udp_url</span><span class="p">)</span>
+        <span class="n">tcp_hosts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">discovery</span><span class="o">.</span><span class="n">load_host_list</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">tcp_url</span><span class="p">)</span>
+        
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">udp_hosts</span><span class="p">)</span><span class="si">}</span><span class="s2"> UDP hosts, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tcp_hosts</span><span class="p">)</span><span class="si">}</span><span class="s2"> TCP hosts&quot;</span><span class="p">)</span>
+        
+        <span class="n">udp_hosts</span> <span class="o">=</span> <span class="n">udp_hosts</span><span class="p">[:</span><span class="n">conf</span><span class="o">.</span><span class="n">udp_limit</span><span class="p">]</span>
+        <span class="n">tcp_hosts</span> <span class="o">=</span> <span class="n">tcp_hosts</span><span class="p">[:</span><span class="n">conf</span><span class="o">.</span><span class="n">tcp_limit</span><span class="p">]</span>
+        
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_query</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">svc</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ip</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">task</span>
+                <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Valid IPv4: </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">svc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Non-IPv4 response from </span><span class="si">{</span><span class="n">svc</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception during STUN query </span><span class="si">{</span><span class="n">svc</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">svc</span><span class="p">)</span>
+        
+        <span class="n">coros</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">udp_hosts</span><span class="p">:</span>
+            <span class="n">coros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_query</span><span class="p">(</span><span class="n">discovery</span><span class="o">.</span><span class="n">query_stun_udp</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;stun:</span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">[UDP]&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tcp_hosts</span><span class="p">:</span>
+            <span class="n">coros</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_query</span><span class="p">(</span><span class="n">discovery</span><span class="o">.</span><span class="n">query_stun_tcp</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;stun:</span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">[TCP]&quot;</span><span class="p">))</span>
+        
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting all STUN queries...&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">coros</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed all STUN queries.&quot;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">results</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">_get_results</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fatal error running STUN IP queries: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">logs</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span> <span class="k">as</span> <span class="n">logger_wrapper</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logger_wrapper</span><span class="p">()</span>
+    
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Testing STUNProvider.get_wan_ip() method...&quot;</span><span class="p">)</span>
+    <span class="n">provider</span> <span class="o">=</span> <span class="n">STUNProvider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;stun-test&quot;</span><span class="p">)</span>
+    <span class="n">ip</span><span class="p">,</span> <span class="n">service</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_wan_ip</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Got IP: </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">service</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;✗ Failed to get IP&quot;</span><span class="p">)</span>
+    
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Testing get_stun_ip_results() function...&quot;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">get_stun_ip_results</span><span class="p">()</span>
+    
+    <span class="n">successful</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">==== STUN Results (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">successful</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> successful) ====&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">svc</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ </span><span class="si">{</span><span class="n">ip</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> &lt;- </span><span class="si">{</span><span class="n">svc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Aziz Kurbanov.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

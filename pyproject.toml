@@ -1,0 +1,23 @@
+[project]
+name = "esddns"
+version = "0.0.1"
+authors = [
+    { email = "aziz@platformrnd.com" },
+    { name  = "Aziz Kurbanov"}
+]
+description = "Open Source Dynamic DNS"
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["dyndns", "dynamicdns", "dns", "dynamic"]
+
+[project.urls]
+issue_tracker = "https://github.com/sqe/esddns/issues"
+repository = "https://github.com/sqe/esddns"
+
+[tools.setuptools]
+pymodules = ["api", "esddns_service"]
