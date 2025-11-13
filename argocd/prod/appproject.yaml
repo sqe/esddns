@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: esddns-prod
+  namespace: argocd
+spec:
+  sourceRepos:
+    - 'https://github.com/sqe/esddns'
+  destinations:
+    - namespace: 'esddns-operator'
+      server: https://kubernetes.default.svc
+    - namespace: 'esddns-*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRole
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRoleBinding
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange

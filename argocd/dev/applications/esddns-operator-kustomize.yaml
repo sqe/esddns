@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: esddns-operator-kustomize-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: esddns-dev
+  source:
+    repoURL: https://github.com/sqe/esddns
+    targetRevision: HEAD
+    path: k8s/overlays/development
+    kustomize:
+      version: v5.0.1
+      commonLabels:
+        app.kubernetes.io/managed-by: argocd
+        environment: development
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: esddns-operator-dev
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,65 @@
+# Artifact Hub Repository Metadata
+# This file helps Artifact Hub understand and display your chart
+
+repositoryName: ESDDNS
+displayName: ESDDNS Operator Helm Chart
+description: A Kubernetes operator for dynamic DNS updates using ESDDNS with Gandi.net API
+
+home: https://github.com/sqe/esddns
+icon: https://raw.githubusercontent.com/sqe/esddns/main/docs/icon.svg
+
+# Keywords for discoverability
+keywords:
+  - dns
+  - dynamic-dns
+  - ddns
+  - kubernetes
+  - operator
+  - gandi
+  - automation
+  - networking
+
+# Categories
+categories:
+  - Integration
+  - Operator
+
+# Maintainers
+maintainers:
+  - name: ESDDNS Team
+    email: support@example.com
+
+# Official links
+links:
+  - name: GitHub
+    url: https://github.com/sqe/esddns
+  - name: Issues
+    url: https://github.com/sqe/esddns/issues
+  - name: Documentation
+    url: https://github.com/sqe/esddns/blob/main/helm/esddns-operator/README.md
+  - name: Source Code
+    url: https://github.com/sqe/esddns
+
+# Provider information
+provider:
+  name: Community
+
+# Operators section
+operators:
+  - name: esddns-operator
+    description: Kubernetes operator for automated DNS updates
+    version: 1.0.0
+    capabilityLevel: Seamless Upgrades
+    maturity: stable
+    repository:
+      url: https://github.com/sqe/esddns
+    capabilities:
+      - Manages nodes and deployments
+      - Updates DNS records
+      - Exports Prometheus metrics
+      - Cloud provider agnostic
+
+# Artifact Hub recommendations
+recommendations:
+  - prometheus
+  - kube-state-metrics

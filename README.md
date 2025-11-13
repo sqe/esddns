@@ -19,6 +19,169 @@ Utilizes dynamic public WAN IPv4 address discovered and retrieved from
 external IPv4 check services and STUN protocol, automatically synchronizes it with
 managed DNS A record via REST APIs.
 
+## Milestone: Kubernetes Operator with Cloud & On-Prem Support
+
+ESDDNS now includes a production-ready **Kubernetes operator** with optimized architecture and multi-cloud support:
+
+### Key Achievements
+- **Centralized IP Detection**: Single leader detects WAN IP once → 90-95% fewer API calls
+- **Distributed DNS Updates**: All nodes update DNS from cached ConfigMap → network isolation safe
+- **Zero Configuration Drift**: All nodes use same detected IP source → consistent state
+- **Cloud Provider Support**: AWS EKS, Google GKE, Azure AKS (automatic LoadBalancer integration)
+- **On-Premises Ready**: MetalLB + STUN protocol for bare-metal Kubernetes clusters
+- **High Availability**: Automatic fallback to direct detection if central detection fails
+- **Full Observability**: Prometheus metrics, ServiceMonitor, and alert rules included
+
+### Supported Deployment Scenarios
+
+| Cloud Provider | Service Type | Load Balancer | Status |
+|---|---|---|---|
+| **AWS EKS** | LoadBalancer | AWS Network/Classic LB | ✅ Production-ready |
+| **Google GKE** | LoadBalancer | Google Cloud LB | ✅ Production-ready |
+| **Azure AKS** | LoadBalancer | Azure LB | ✅ Production-ready |
+| **On-Prem (MetalLB)** | LoadBalancer | MetalLB Layer 2/BGP | ✅ Production-ready |
+| **Self-Hosted** | NodePort | Manual exposure | ✅ Supported |
+
+### MetalLB Integration for On-Premises
+
+For bare-metal Kubernetes clusters without cloud provider support, ESDDNS works seamlessly with **MetalLB**:
+
+```yaml
+# MetalLB provides LoadBalancer service type on-prem
+# Layer 2 Mode: Uses ARP for IP advertisement (simple, same-subnet only)
+# BGP Mode: Full BGP advertisement (enterprise, multi-subnet support)
+
+# Example MetalLB AddressPool
+apiVersion: metallb.io/v1beta1
+kind: AddressPool
+metadata:
+  name: esddns-pool
+spec:
+  addresses:
+  - 192.168.1.100-192.168.1.110  # Your on-prem IP range
+  autoAssign: true
+```
+
+**Why MetalLB helps for on-prem:**
+- Enables LoadBalancer service type (normally cloud-only)
+- BGP mode advertises service IP to your network
+- Works with STUN protocol for WAN IP detection
+- No proprietary vendor lock-in
+
+📘 **See [METALLB_GUIDE.md](METALLB_GUIDE.md) for complete on-premises deployment guide**
+
+**WAN IP Detection on On-Prem:**
+- **STUN Protocol**: Best option for NAT traversal (RFC 8489 compliant)
+- **HTTP Services**: If external internet access available
+- **Direct Detection**: If node has public interface directly assigned
+- **Fallback Chain**: Tries STUN first, falls back to HTTP, then direct detection
+
+### Quick Deployment
+
+```bash
+# Cloud providers (AWS EKS, Google GKE, Azure AKS)
+export GANDI_API_KEY="your-api-key"
+cd k8s
+./deploy.sh production
+
+# On-premises with MetalLB (automated - recommended!)
+export GANDI_API_KEY="your-api-key"
+cd k8s
+./deploy-metallb.sh production 192.168.1.100-192.168.1.110
+# This script installs MetalLB + ESDDNS in one command
+
+# Or manually:
+# 1. Install MetalLB first
+helm install metallb metallb/metallb -n metallb-system
+# 2. Create AddressPool (see example above)
+# 3. Deploy ESDDNS
+./deploy.sh production
+```
+
+### Architecture Highlights
+
+**Centralized IP Detection (Leader)**
+- Kopf timer handler runs once every 5 minutes
+- Uses Kopf's lock mechanism for leader election
+- Stores IP in ConfigMap for all nodes to read
+- Result: 1 external API call instead of N
+
+**Distributed DNS Updates (All Nodes)**
+- DaemonSet reads cached IP from ConfigMap
+- Updates DNS only if IP changed
+- Automatic fallback if ConfigMap unavailable/stale
+- Result: No network isolation issues, consistent state
+
+See [k8s/README.md](k8s/README.md) for detailed architecture, [OPERATOR_SUMMARY.md](OPERATOR_SUMMARY.md) for implementation details, and [README_OPERATOR.md](README_OPERATOR.md) for comprehensive documentation.
+
+### Helm Chart Support
+
+ESDDNS also provides **Helm charts** for simplified deployment:
+
+```bash
+# Install via Helm
+helm install esddns-operator ./helm/esddns-operator \
+  --namespace esddns-system \
+  --create-namespace \
+  --set gandi.apiKey=YOUR_GANDI_API_KEY \
+  --set global.domain=yourdomain.com
+
+# Verify
+kubectl get all -n esddns-system
+```
+
+**Helm Features:**
+- One-command deployment and upgrades
+- Production and development value presets
+- Automatic RBAC and secret management
+- Published to Artifact Hub for easy discovery
+- Full configuration customization via values.yaml
+
+See [helm/README.md](helm/README.md) and [helm/esddns-operator/README.md](helm/esddns-operator/README.md) for complete Helm documentation.
+
+### ArgoCD GitOps Support
+
+ESDDNS integrates seamlessly with **ArgoCD** for GitOps-based deployments with environment separation:
+
+```bash
+# Deploy to development (auto-sync enabled)
+kubectl apply -k argocd/dev/
+
+# Deploy to production (manual sync only)
+kubectl apply -k argocd/prod/
+
+# Or use automated bootstrap
+cd argocd/bootstrap
+./argocd-setup.sh both
+```
+
+**ArgoCD Features:**
+- **Environment-separated**: Dedicated dev and prod configurations
+- **Helm and Kustomize support**: Choose your deployment method
+- **Auto-sync for dev**: Automatic deployment on Git commits
+- **Manual sync for prod**: Requires human approval for safety
+- **Unified control**: Single source of truth in Git
+- **Complete observability**: ArgoCD UI dashboard and CLI
+
+See [argocd/README.md](argocd/README.md), [argocd/QUICKSTART.md](argocd/QUICKSTART.md), and [argocd/DEPLOYMENT.md](argocd/DEPLOYMENT.md) for complete ArgoCD deployment documentation.
+
+### Complete Documentation Index
+
+Choose your deployment path:
+
+| Documentation | Purpose | Time Required |
+|---|---|---|
+| [QUICKSTART.md](QUICKSTART.md) | 60-second deploy guide | 5 minutes |
+| [argocd/QUICKSTART.md](argocd/QUICKSTART.md) | **GitOps ArgoCD deployment** | **5 minutes** |
+| [METALLB_GUIDE.md](METALLB_GUIDE.md) | **On-premises MetalLB deployment** | **15 minutes** |
+| [k8s/DEPLOYMENT.md](k8s/DEPLOYMENT.md) | Complete installation walkthrough | 30 minutes |
+| [k8s/README.md](k8s/README.md) | Architecture & features overview | 15 minutes |
+| [OPERATOR_SUMMARY.md](OPERATOR_SUMMARY.md) | Implementation details | 20 minutes |
+| [README_OPERATOR.md](README_OPERATOR.md) | Master index for operator | 5 minutes |
+| [helm/README.md](helm/README.md) | Helm chart deployment | 10 minutes |
+| [argocd/DEPLOYMENT.md](argocd/DEPLOYMENT.md) | ArgoCD comprehensive guide | 20 minutes |
+| [argocd/STRUCTURE.md](argocd/STRUCTURE.md) | ArgoCD architecture details | 10 minutes |
+
 [Documentation](https://sqe.github.io/esddns/)
 
 

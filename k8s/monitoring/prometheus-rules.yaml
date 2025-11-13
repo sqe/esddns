@@ -1,0 +1,66 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: esddns-alerts
+  namespace: esddns-system
+  labels:
+    app: esddns
+spec:
+  groups:
+  - name: esddns.rules
+    interval: 30s
+    rules:
+    # Alert if DNS updates are failing
+    - alert: ESDDNSDNSUpdateFailures
+      expr: increase(dns_update_failures_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: critical
+        component: esddns-operator
+      annotations:
+        summary: "ESDDNS DNS update failures detected"
+        description: "DNS update failures increased in the last 5 minutes"
+    
+    # Alert if no DNS updates in expected interval
+    - alert: ESDDNSNoRecentUpdates
+      expr: (time() - esddns_last_dns_update) > 1200
+      for: 10m
+      labels:
+        severity: warning
+        component: esddns-operator
+      annotations:
+        summary: "ESDDNS has not updated DNS in 20 minutes"
+        description: "Last DNS update was more than 20 minutes ago"
+    
+    # Alert if operator is down
+    - alert: ESDDNSOperatorDown
+      expr: up{job="esddns-operator"} == 0
+      for: 2m
+      labels:
+        severity: critical
+        component: esddns-operator
+      annotations:
+        summary: "ESDDNS operator is down"
+        description: "ESDDNS operator pod is not responding to metrics requests"
+    
+    # Alert if service is down
+    - alert: ESDDNSServiceDown
+      expr: up{job="esddns-service"} == 0
+      for: 2m
+      labels:
+        severity: warning
+        component: esddns-service
+      annotations:
+        summary: "ESDDNS web service is down"
+        description: "ESDDNS web service pod is not responding to health checks"
+    
+    # Alert if LoadBalancer IP is not assigned
+    - alert: ESDDNSLoadBalancerPending
+      expr: count(kube_service_status_load_balancer_ingress{service="esddns-service"}) == 0
+      for: 5m
+      labels:
+        severity: warning
+        component: esddns-service
+      annotations:
+        summary: "ESDDNS LoadBalancer IP not yet assigned"
+        description: "LoadBalancer service has not been assigned an external IP"
