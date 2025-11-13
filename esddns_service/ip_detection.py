@@ -5,7 +5,7 @@ Used by Flask service to detect IP once, shared via ConfigMap to all DaemonSet p
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, Dict, Tuple
 import threading
 from api.get_ip import WANIPState

@@ -21,12 +21,10 @@ from datetime import datetime
 from pathlib import Path
 import os
 import sys
-import json
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from esddns import ESDDNS
 from api.dns_manager import DomainManagement
 from api.get_ip import WANIPState
 from api.logs import logger as logger_wrapper
