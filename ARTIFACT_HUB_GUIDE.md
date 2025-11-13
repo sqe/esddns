@@ -4,7 +4,7 @@ This guide walks you through publishing the ESDDNS Operator Helm chart to Artifa
 
 ## What is Artifact Hub?
 
-Artifact Hub (https://artifacthub.io) is a web-based application that helps users find, install, and publish Kubernetes packages (Helm charts, operators, etc.).
+Artifact Hub (https://artifacthub.io/) is a web-based application that helps users find, install, and publish Kubernetes packages (Helm charts, operators, etc.).
 
 ## Prerequisites
 
@@ -129,7 +129,7 @@ curl https://sqe.github.io/esddns/helm-repo/index.yaml
 
 ### Create Artifact Hub Account
 
-1. Visit https://artifacthub.io
+1. Visit https://artifacthub.io/
 2. Click **Sign in** (top right)
 3. Select **Sign in with GitHub**
 4. Authorize Artifact Hub
@@ -166,7 +166,7 @@ This typically takes 5-10 minutes.
 
 ### Check Artifact Hub
 
-1. Visit https://artifacthub.io
+1. Visit https://artifacthub.io/
 2. Search for: `esddns-operator`
 3. You should see your chart listed
 
