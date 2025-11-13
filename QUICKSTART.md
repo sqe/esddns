@@ -41,9 +41,13 @@ Done! Your DNS is now syncing automatically.
 ## What Just Deployed
 
 ✅ **Operator DaemonSet** - Monitors every node for IP changes
+
 ✅ **Flask Web Service** - Exposes DNS state via REST API
+
 ✅ **LoadBalancer Service** - Stable external IP from cloud provider
+
 ✅ **Kubernetes Configuration** - RBAC, ConfigMaps, Secrets
+
 ✅ **Monitoring Setup** - Prometheus metrics and alerts ready
 
 ## Common Commands
@@ -328,4 +332,4 @@ kubectl delete -f k8s/monitoring/
 
 **Happy DNS syncing! 🚀**
 
-Need more details? See [DEPLOYMENT.md](DEPLOYMENT.md)
+Need more details? See [k8s/DEPLOYMENT.md](k8s/DEPLOYMENT.md)

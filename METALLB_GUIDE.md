@@ -23,24 +23,24 @@ On-Premises Network
 ┌────────────────────────────────────────────────────────┐
 │ Kubernetes Cluster                                     │
 │                                                        │
-│  ┌──────────────────────────────────────────────┐    │
-│  │ ESDDNS Operator (DaemonSet)                  │    │
-│  │ • Detects WAN IP via STUN protocol           │    │
-│  │ • Updates Gandi DNS with public IP           │    │
-│  └──────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────┐      │
+│  │ ESDDNS Operator (DaemonSet)                  │      │
+│  │ • Detects WAN IP via STUN protocol           │      │
+│  │ • Updates Gandi DNS with public IP           │      │
+│  └──────────────────────────────────────────────┘      │
 │                                                        │
-│  ┌──────────────────────────────────────────────┐    │
-│  │ ESDDNS Service (LoadBalancer)                │    │
-│  │ • Type: LoadBalancer                         │    │
-│  │ • MetalLB assigns IP: 192.168.1.100          │    │
-│  └──────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────┐      │
+│  │ ESDDNS Service (LoadBalancer)                │      │
+│  │ • Type: LoadBalancer                         │      │
+│  │ • MetalLB assigns IP: 192.168.1.100          │      │
+│  └──────────────────────────────────────────────┘      │
 │                                                        │
-│  ┌──────────────────────────────────────────────┐    │
-│  │ MetalLB Speaker (DaemonSet)                  │    │
-│  │ • Advertises 192.168.1.100 on local network  │    │
-│  │ • Layer 2: ARP responses                     │    │
-│  │ • BGP: Routes to upstream routers            │    │
-│  └──────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────┐      │
+│  │ MetalLB Speaker (DaemonSet)                  │      │
+│  │ • Advertises 192.168.1.100 on local network  │      │
+│  │ • Layer 2: ARP responses                     │      │
+│  │ • BGP: Routes to upstream routers            │      │
+│  └──────────────────────────────────────────────┘      │
 │                                                        │
 └────────────────┬───────────────────────────────────────┘
                  │
@@ -546,7 +546,7 @@ kubectl rollout restart deployment/esddns-service -n esddns-production
 
 ## Resources
 
-- **MetalLB Documentation**: https://metallb.universe.tf/
+- **MetalLB Documentation**: https://metallb.universe.tf
 - **ESDDNS Documentation**: [README.md](README.md)
 - **STUN RFC**: https://datatracker.ietf.org/doc/html/rfc8489
 - **Quick Start**: [QUICKSTART.md](QUICKSTART.md)

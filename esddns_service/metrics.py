@@ -3,8 +3,7 @@ Prometheus metrics integration for ESDDNS service
 Exposes metrics about DNS update operations and system health
 """
 
-from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
-from datetime import datetime
+from prometheus_client import Counter, Gauge, Histogram, generate_latest
 import time
 
 # DNS Update Metrics

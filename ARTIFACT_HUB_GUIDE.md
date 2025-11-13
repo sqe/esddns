@@ -1,10 +1,12 @@
-# Publishing ESDDNS Operator to Artifact Hub
+# Publishing Kubernetes Operators to Artifact Hub
 
-This guide walks you through publishing the ESDDNS Operator Helm chart to Artifact Hub, making it discoverable and installable for the Kubernetes community.
+This guide walks you through publishing your Kubernetes Operator Helm chart to Artifact Hub, making it discoverable and installable for the Kubernetes community worldwide.
+
+> **About this guide**: While examples use ESDDNS, this guide applies to any Kubernetes operator. Substitute your operator name where indicated.
 
 ## What is Artifact Hub?
 
-Artifact Hub (https://artifacthub.io) is a web-based application that helps users find, install, and publish Kubernetes packages (Helm charts, operators, etc.).
+Artifact Hub (https://artifacthub.io/) is a web-based application that helps users find, install, and publish Kubernetes packages (Helm charts, operators, etc.).
 
 ## Prerequisites
 
@@ -73,63 +75,86 @@ helm repo index helm-repo \
 
 ## Step 3: Push to GitHub
 
-### Create Helm Repository Branch
+### Option A: Use gh-pages Branch (Recommended)
 
 ```bash
-cd helm/
-
-# Create a new branch for Helm repository (optional)
+# Create a new branch for GitHub Pages
 git checkout --orphan gh-pages
 
 # Clear the branch
 git reset --hard
 git clean -fd
 
+# Create directory structure for multiple documentation paths
+mkdir -p helm-repo docs
+
 # Copy helm-repo contents
-cp -r helm-repo/* .
+cp -r helm/helm-repo/* helm-repo/
+
+# If you have Sphinx documentation, copy it too
+# cp -r path/to/sphinx/build/html/* docs/
 
 # Commit and push
 git add .
-git commit -m "Initial Helm repository structure"
+git commit -m "Add Helm repository and documentation structure"
 git push -u origin gh-pages
 ```
 
-Or keep it on main branch:
+### Option B: Keep Everything on main Branch
 
 ```bash
 git add helm/helm-repo/
-git commit -m "Release esddns-operator Helm chart v1.0.0"
+git commit -m "Release operator Helm chart v1.0.0"
 git push origin main
 ```
 
 ## Step 4: Enable GitHub Pages
 
-1. Go to your repository: https://github.com/sqe/esddns
+### Setup for Multi-Path Serving (Recommended)
+
+If serving both Helm charts and Sphinx documentation:
+
+1. Go to your repository settings: `https://github.com/YOUR_ORG/YOUR_REPO`
 2. Navigate to **Settings** → **Pages**
 3. Under "Build and deployment":
    - **Source**: Select "Deploy from a branch"
-   - **Branch**: Select `gh-pages` (or `main`)
-   - **Folder**: Select `/helm-repo` (if on main) or `/` (if on gh-pages)
+   - **Branch**: Select `gh-pages`
+   - **Folder**: Select `/` (root)
 4. Click **Save**
 
-Wait for GitHub Actions to complete. Your Helm repository is now available at:
-```
-https://sqe.github.io/esddns/helm-repo
-```
+This configuration serves both paths:
+- `https://YOUR_ORG.github.io/YOUR_REPO/helm-repo/` (Helm charts)
+- `https://YOUR_ORG.github.io/YOUR_REPO/docs/` (Python/Sphinx documentation)
+
+### Setup for Helm-Only (Simple)
+
+If only serving Helm charts:
+
+1. Go to your repository settings
+2. Navigate to **Settings** → **Pages**
+3. Under "Build and deployment":
+   - **Source**: Select "Deploy from a branch"
+   - **Branch**: Select `gh-pages` or `main`
+   - **Folder**: Select `/helm-repo` (if on main) or `/` (if on gh-pages)
+4. Click **Save**
 
 ### Verify GitHub Pages
 
 ```bash
+# Test your Helm repository
+curl https://YOUR_ORG.github.io/YOUR_REPO/helm-repo/index.yaml
+
+# For ESDDNS example:
 curl https://sqe.github.io/esddns/helm-repo/index.yaml
 
-# Should show your chart listing
+# Should return your chart listing
 ```
 
 ## Step 5: Register on Artifact Hub
 
 ### Create Artifact Hub Account
 
-1. Visit https://artifacthub.io
+1. Visit https://artifacthub.io/
 2. Click **Sign in** (top right)
 3. Select **Sign in with GitHub**
 4. Authorize Artifact Hub
@@ -144,11 +169,17 @@ curl https://sqe.github.io/esddns/helm-repo/index.yaml
 
 | Field | Value |
 |-------|-------|
-| **Name** | `esddns-operator` |
+| **Name** | `your-operator-name` |
 | **Kind** | `Helm chart` |
-| **Repository URL** | `https://sqe.github.io/esddns/helm-repo` |
+| **Repository URL** | `https://YOUR_ORG.github.io/YOUR_REPO/helm-repo` |
 | **Authentication** | `Not required` |
 | **Official repository** | Leave unchecked |
+
+**Example for ESDDNS**:
+| Field | Value |
+|-------|-------|
+| **Name** | `esddns-operator` |
+| **Repository URL** | `https://sqe.github.io/esddns/helm-repo` |
 
 6. Click **Add**
 
@@ -166,21 +197,33 @@ This typically takes 5-10 minutes.
 
 ### Check Artifact Hub
 
-1. Visit https://artifacthub.io
-2. Search for: `esddns-operator`
-3. You should see your chart listed
+1. Visit https://artifacthub.io/
+2. Search for your operator name (e.g., `esddns-operator`)
+3. You should see your chart listed within 5-10 minutes
 
 ### Install from Artifact Hub
 
-Users can now install your chart:
+Users can now install your operator:
 
 ```bash
-# Add repository
+# Generic example
+helm repo add your-operator https://YOUR_ORG.github.io/YOUR_REPO/helm-repo
+helm repo update
+
+# Install your operator chart
+helm install your-operator your-operator/your-operator-chart \
+  --namespace your-namespace \
+  --create-namespace
+```
+
+**Example for ESDDNS**:
+```bash
 helm repo add esddns https://sqe.github.io/esddns/helm-repo
 helm repo update
 
-# Install chart
 helm install esddns-operator esddns/esddns-operator \
+  --namespace esddns \
+  --create-namespace \
   --set gandi.apiKey=YOUR_KEY \
   --set global.domain=yourdomain.com
 ```
@@ -284,9 +327,11 @@ annotations:
 
 ## Additional Resources
 
-- **Helm Documentation**: https://helm.sh/docs/
+- **Helm Chart Repository Guide**: https://helm.sh/docs/topics/chart_repository/
+- **Helm Best Practices**: https://helm.sh/docs/chart_best_practices/
 - **Artifact Hub Documentation**: https://artifacthub.io/docs/
-- **Chart Best Practices**: https://helm.sh/docs/chart_best_practices/
+- **Artifact Hub Helm Repository Guide**: https://artifacthub.io/docs/topics/repositories/helm-charts/
+- **Kubernetes Operator Pattern**: https://kubernetes.io/docs/concepts/extend-kubernetes/operator/
 - **Kubernetes Security**: https://kubernetes.io/docs/concepts/security/
 
 ## Support
@@ -298,4 +343,13 @@ For issues related to:
 
 ---
 
-**Next**: After publication, users can discover and install your chart from Artifact Hub!
+## What's Next?
+
+After publication, your operator becomes discoverable to thousands of Kubernetes users worldwide. They can:
+
+1. **Find your operator** on Artifact Hub's searchable registry
+2. **Review your documentation** and security posture
+3. **Install with one command** using Helm
+4. **Stay updated** as you release new versions
+
+Monitor your operator's adoption through Artifact Hub analytics and engage with your growing community.
