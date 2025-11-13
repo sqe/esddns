@@ -19,10 +19,10 @@ entries:
         - kube-state-metrics
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-11-13T20:10:43.418267869Z"
+    created: "2025-11-13T23:51:08.060140304Z"
     description: A Kubernetes operator for dynamic DNS updates using ESDDNS with Gandi.net
       API
-    digest: 3776ffd17c17ad24cece155150d449a7cc1c044c8f87c9fcdf5fb3333578fa69
+    digest: 07db53ef6d64abc2b62de9bbe578049ce9b7fd47d0aa608ca646aa6c231b278e
     home: https://github.com/sqe/esddns
     icon: https://raw.githubusercontent.com/sqe/esddns/main/docs/icon.svg
     keywords:
@@ -44,4 +44,4 @@ entries:
     urls:
     - https://sqe.github.io/esddns/helm-repo/esddns-operator-1.0.0.tgz
     version: 1.0.0
-generated: "2025-11-13T20:10:43.417196038Z"
+generated: "2025-11-13T23:51:08.059100506Z"
