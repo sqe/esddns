@@ -47,7 +47,7 @@ Production-ready Kubernetes operator for automatic DNS synchronization with Gand
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│     Kubernetes Cluster (Any Cloud)                    │
+│     Kubernetes Cluster (Any Cloud)                   │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
 │  CENTRALIZED IP DETECTION (Leader)                   │
@@ -55,38 +55,38 @@ Production-ready Kubernetes operator for automatic DNS synchronization with Gand
 │  │   esddns-operator (Single Instance)            │  │
 │  │   CentralizedIPDetector (detect_wan_ip)        │  │
 │  │   - Runs once every 5 minutes                  │  │
-│  │   - Detects WAN IP from external services     │  │
-│  │   - Stores in ConfigMap: esddns-wan-ip        │  │
+│  │   - Detects WAN IP from external services      │  │
+│  │   - Stores in ConfigMap: esddns-wan-ip         │  │
 │  └─────────────────────┬──────────────────────────┘  │
-│                        │                              │
-│                        ▼                              │
+│                        │                             │
+│                        ▼                             │
 │            ┌───────────────────────┐                 │
 │            │ ConfigMap             │                 │
 │            │ esddns-wan-ip         │                 │
 │            │ - current_ip: X.X.X.X │                 │
 │            │ - timestamp: ...      │                 │
 │            └───────────────────────┘                 │
-│                        ▲                              │
-│                        │ (Read cached IP)             │
-│                        │                              │
+│                        ▲                             │
+│                        │ (Read cached IP)            │
+│                        │                             │
 │  DISTRIBUTED DNS UPDATES (All Nodes)                 │
 │  Node 1              Node 2        Node N            │
 │  ┌──────────┐       ┌──────────┐                     │
-│  │ Operator │       │ Operator │ ...  DaemonSet     │
+│  │ Operator │       │ Operator │ ...  DaemonSet      │
 │  │ Pod      │       │ Pod      │      (hostNetwork)  │
-│  │ NodeDNS  │       │ NodeDNS  │      Distributed   │
+│  │ NodeDNS  │       │ NodeDNS  │      Distributed    │
 │  │ Updater  │       │ Updater  │                     │
 │  └────┬─────┘       └────┬─────┘                     │
-│       │                  │                            │
+│       │                  │                           │
 │       │ (Update if IP changed)                       │
-│       │                  │                            │
+│       │                  │                           │
 │       └──────────────────┴────────┐                  │
 │                                   │                  │
-│  ┌────────────────────────────────▼──┐               │
-│  │ esddns-service (Deployment)       │               │
-│  │ Flask Web Service (Single Replica) │               │
-│  └────────────────────────────────────┘               │
-│             │                                         │
+│  ┌────────────────────────────────▼───┐              │
+│  │ esddns-service (Deployment)        │              │
+│  │ Flask Web Service (Single Replica) │              │
+│  └────────────────────────────────────┘              │
+│             │                                        │
 │  ┌──────────▼──────────────────┐                     │
 │  │ LoadBalancer Service        │                     │
 │  │ (cloud provider ELB/LB)     │                     │
